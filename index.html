@@ -111,7 +111,7 @@
         .icon-green { background: rgba(5, 205, 153, 0.1); color: var(--success); }
         .icon-orange { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
 
-        /* ================= الإحصائيات الهندسية المتقدمة (Geometric Cards) ================= */
+        /* ================= الإحصائيات الهندسية المتقدمة ================= */
         .charts-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 25px; margin-bottom: 40px; }
         .geom-card { background: var(--white); padding: 30px; border-radius: 24px; box-shadow: var(--shadow-soft); display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden; transition: var(--transition); }
         .geom-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-hover); }
@@ -159,9 +159,9 @@
         .progress-fill { height: 100%; background: linear-gradient(90deg, var(--primary), #868CFF); border-radius: 20px; transition: width 1s ease; }
 
         /* ================= بروفايل الأستاذ ================= */
-        .tp-header { background: var(--white); padding: 35px; border-radius: 24px; box-shadow: var(--shadow-soft); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; position: relative;}
+        .tp-header { background: var(--white); padding: 35px; border-radius: 24px; box-shadow: var(--shadow-soft); margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; position: relative; flex-wrap: wrap; gap:20px;}
         .tp-info h2 { color: var(--text-main); font-weight: 900; font-size: 28px; margin-bottom: 8px; }
-        .tp-due-box { background: linear-gradient(135deg, #05CD99, #04b386); padding: 25px 35px; border-radius: 20px; text-align: center; color: white; box-shadow: 0 15px 30px rgba(5, 205, 153, 0.3); }
+        .tp-due-box { background: linear-gradient(135deg, #05CD99, #04b386); padding: 25px 35px; border-radius: 20px; text-align: center; color: white; box-shadow: 0 15px 30px rgba(5, 205, 153, 0.3); min-width: 250px;}
         .tp-due-box p { font-size: 14px; font-weight: 700; margin-bottom: 8px; opacity: 0.9; }
         .tp-due-box h3 { font-size: 32px; font-weight: 900; }
         .student-assign-item { display: flex; justify-content: space-between; align-items: center; padding: 20px 25px; background: var(--white); border-radius: 20px; margin-bottom: 15px; border-right: 5px solid var(--primary); box-shadow: var(--shadow-soft); transition: var(--transition); }
@@ -169,8 +169,6 @@
 
         /* ================= DataTable & Excel Button التخصيص ================= */
         .dt-container { background: var(--white); padding: 30px; border-radius: 24px; box-shadow: var(--shadow-soft); }
-        
-        /* ستايل زر الإكسل */
         .dt-buttons { margin-bottom: 20px; }
         .dt-buttons .dt-button { background: var(--success) !important; color: white !important; border: none !important; border-radius: 12px !important; padding: 10px 24px !important; font-family: 'Cairo', sans-serif !important; font-weight: 800 !important; font-size: 14px !important; box-shadow: 0 8px 15px rgba(5, 205, 153, 0.2) !important; transition: var(--transition) !important; display: inline-flex; align-items: center; gap: 8px; }
         .dt-buttons .dt-button:hover { transform: translateY(-3px) !important; box-shadow: 0 12px 20px rgba(5, 205, 153, 0.3) !important; background: #04b386 !important; }
@@ -208,6 +206,7 @@
         .day-chip span { display: block; padding: 12px 10px; border-radius: 14px; background: #F4F7FE; border: 2px solid #E0E5F2; color: var(--text-muted); font-size: 14px; font-weight: 700; transition: var(--transition); }
         .day-chip input:checked + span { background: var(--primary); border-color: var(--primary); color: var(--white); box-shadow: 0 8px 15px rgba(67, 24, 255, 0.25); transform: translateY(-2px); }
 
+        /* Timeline للسجلات */
         .timeline { margin-top: 25px; max-height: 350px; overflow-y: auto; padding-right: 15px; }
         .timeline-item { display: flex; gap: 20px; margin-bottom: 25px; position: relative; animation: fadeUp 0.4s ease forwards; opacity: 0; }
         .timeline-item::before { content: ''; position: absolute; right: 9px; top: 30px; bottom: -25px; width: 2px; background: #E0E5F2; }
@@ -350,8 +349,9 @@
                     <div class="tp-info">
                         <h2 id="tp_name">اسم الأستاذ</h2>
                         <p style="color: var(--text-muted); font-weight:700; font-size:15px;" id="tp_id"><i class="fa-solid fa-id-card"></i> ID: T101</p>
-                        <div style="margin-top: 25px; display: flex; gap: 12px;">
+                        <div style="margin-top: 25px; display: flex; gap: 12px; flex-wrap:wrap;">
                             <button class="btn-primary btn-small btn-outline" onclick="openEditTeacherModal()"><i class="fa-solid fa-pen"></i> تعديل الحساب</button>
+                            <button class="btn-primary btn-small btn-outline" onclick="viewTeacherHistory()"><i class="fa-solid fa-list-ul"></i> سجل الدفعات</button>
                             <button class="btn-primary btn-success btn-small" onclick="openSettleModal()"><i class="fa-solid fa-hand-holding-dollar"></i> تسديد مستحقات</button>
                             <button class="btn-primary btn-outline-danger btn-small" onclick="deleteTeacherBtn()"><i class="fa-solid fa-trash"></i> حذف الحساب</button>
                         </div>
@@ -438,9 +438,18 @@
     </div>
     <div class="modal-overlay" id="settleTeacherModal">
         <div class="modal">
-            <h2>تسديد مستحقات</h2>
+            <h2>تسديد مستحقات الأستاذ</h2>
             <div class="form-group"><label>المبلغ المراد دفعه للأستاذ (يخصم من رصيده)</label><input type="number" id="settle_amount"></div>
+            <div class="form-group"><label>ملاحظة / تفاصيل الدفعة (اختياري)</label><input type="text" id="settle_note" placeholder="مثال: راتب شهر 10"></div>
             <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('settleTeacherModal')">إلغاء</button><button class="btn-save" onclick="confirmSettle()">تأكيد العملية</button></div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="teacherHistoryModal">
+        <div class="modal modal-lg">
+            <h2>سجل دفعات الأستاذ</h2>
+            <p id="hist_t_name" style="text-align:center; color:var(--primary); font-weight:800; font-size:18px; margin-bottom:10px;"></p>
+            <div class="timeline" id="teacherPaymentsTimeline"></div>
+            <div class="modal-actions"><button class="btn-cancel" style="flex:1;" onclick="closeModal('teacherHistoryModal')">إغلاق السجل</button></div>
         </div>
     </div>
 
@@ -468,7 +477,7 @@
         </div>
     </div>
 
-    <!-- نوافذ المالية والتوزيع -->
+    <!-- نوافذ المالية والتوزيع للطلاب -->
     <div class="modal-overlay" id="paymentModal">
         <div class="modal">
             <h2>تسجيل دفعة واردة</h2>
@@ -532,68 +541,44 @@
         let allTeachers = {}; let allStudents = {}; let allAssignments = {};
         let currentViewingTeacherId = null; let myChart = null; let studentStatusChart = null; let collectionRateChart = null; let dataTable;
 
-        // تهيئة DataTables و Charts
         $(document).ready(function() {
             dataTable = $('#comprehensiveTable').DataTable({
                 "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json" },
                 "pageLength": 10, "ordering": true, "responsive": true,
                 "dom": '<"dt-top"Bf>rt<"dt-bottom"ip>',
-                "buttons": [
-                    { extend: 'excelHtml5', text: '<i class="fa-solid fa-file-excel"></i> تصدير إلى Excel', className: 'dt-button' }
-                ]
+                "buttons": [ { extend: 'excelHtml5', text: '<i class="fa-solid fa-file-excel"></i> تصدير إلى Excel', className: 'dt-button' } ]
             });
             initCharts();
         });
 
         function initCharts() {
-            // الشارت العام (Bar)
-            myChart = new Chart(document.getElementById('mainChart').getContext('2d'), {
-                type: 'bar', data: { labels: ['إجمالي مبالغ الكورسات', 'المبالغ المحصلة', 'المبالغ المتبقية'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#4318FF', '#05CD99', '#EE5D50'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } }
-            });
-            // شارت حالة التوزيع (Doughnut)
-            studentStatusChart = new Chart(document.getElementById('studentStatusChart').getContext('2d'), {
-                type: 'doughnut', data: { labels: ['مرتبط', 'غير مرتبط'], datasets: [{ data: [0, 1], backgroundColor: ['#4318FF', '#E0E5F2'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } }
-            });
-            // شارت التحصيل المالي (Doughnut)
-            collectionRateChart = new Chart(document.getElementById('collectionRateChart').getContext('2d'), {
-                type: 'doughnut', data: { labels: ['مستلم', 'متبقي'], datasets: [{ data: [0, 1], backgroundColor: ['#05CD99', '#EE5D50'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } }
-            });
+            myChart = new Chart(document.getElementById('mainChart').getContext('2d'), { type: 'bar', data: { labels: ['إجمالي مبالغ الكورسات', 'المبالغ المحصلة', 'المبالغ المتبقية'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#4318FF', '#05CD99', '#EE5D50'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } } });
+            studentStatusChart = new Chart(document.getElementById('studentStatusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['مرتبط', 'غير مرتبط'], datasets: [{ data: [0, 1], backgroundColor: ['#4318FF', '#E0E5F2'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } } });
+            collectionRateChart = new Chart(document.getElementById('collectionRateChart').getContext('2d'), { type: 'doughnut', data: { labels: ['مستلم', 'متبقي'], datasets: [{ data: [0, 1], backgroundColor: ['#05CD99', '#EE5D50'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } } });
         }
 
         function updateChartAndTable() {
-            let totalExpected = 0, totalCollected = 0, totalRemaining = 0;
-            let tableData = []; 
-            let assignedCount = 0;
-            let totalStudents = Object.keys(allStudents).length;
-
+            let totalExpected = 0, totalCollected = 0, totalRemaining = 0; let tableData = []; let assignedCount = 0; let totalStudents = Object.keys(allStudents).length;
             for(let sId in allStudents) {
                 const s = allStudents[sId], price = s.coursePrice || 0, paid = s.paidAmount || 0, rem = price - paid;
                 totalExpected += price; totalCollected += paid; totalRemaining += rem;
-                
-                let assignedTeacherNames = [];
-                let isAssigned = false;
+                let assignedTeacherNames = []; let isAssigned = false;
                 for(let tId in allAssignments) { if(allAssignments[tId][sId]) { assignedTeacherNames.push(allTeachers[tId] ? allTeachers[tId].name : 'أستاذ محذوف'); isAssigned = true; } }
                 if(isAssigned) assignedCount++;
-
                 tableData.push([sId, s.name, s.courseName || 'غير محدد', assignedTeacherNames.length > 0 ? assignedTeacherNames.join('، ') : 'غير مرتبط', formatMoneyRaw(price), formatMoneyRaw(paid), formatMoneyRaw(rem), s.duration || 'غير محدد']);
             }
 
-            // تحديث الشارت الرئيسي المالي
             if(myChart) { myChart.data.datasets[0].data = [totalExpected, totalCollected, totalRemaining]; myChart.update(); }
             document.getElementById('totalRevenue').innerHTML = formatMoney(totalExpected);
 
-            // تحديث شارت حالة الطلاب والهندسة
-            let unassignedCount = totalStudents - assignedCount;
-            let assignPercent = totalStudents > 0 ? Math.round((assignedCount / totalStudents) * 100) : 0;
+            let unassignedCount = totalStudents - assignedCount; let assignPercent = totalStudents > 0 ? Math.round((assignedCount / totalStudents) * 100) : 0;
             if(studentStatusChart) { studentStatusChart.data.datasets[0].data = [assignedCount, unassignedCount == 0 && assignedCount == 0 ? 1 : unassignedCount]; studentStatusChart.update(); }
             document.getElementById('assignedCount').innerText = assignedCount; document.getElementById('unassignedCount').innerText = unassignedCount; document.getElementById('studentStatusPercent').innerText = assignPercent + '%';
 
-            // تحديث شارت التحصيل
             let colPercent = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0;
             if(collectionRateChart) { collectionRateChart.data.datasets[0].data = [totalCollected, totalRemaining == 0 && totalCollected == 0 ? 1 : totalRemaining]; collectionRateChart.update(); }
             document.getElementById('collectionRatePercent').innerText = colPercent + '%';
 
-            // تحديث DataTables
             if(dataTable) { dataTable.clear(); dataTable.rows.add(tableData); dataTable.draw(); }
         }
 
@@ -601,22 +586,20 @@
         function openModal(modalId) { const m = document.getElementById(modalId); m.style.display = 'flex'; setTimeout(() => { m.style.opacity = '1'; m.querySelector('.modal').classList.add('show'); }, 10); }
         function closeModal(modalId) { const m = document.getElementById(modalId); m.style.opacity = '0'; m.querySelector('.modal').classList.remove('show'); setTimeout(() => { m.style.display = 'none'; m.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"])').forEach(i=>i.value=''); m.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false); }, 400); }
 
-        // الحذف والتعديل المتقدم (SweetAlert2)
         async function deleteStudentBtn(sId) { Swal.fire({ title: 'هل أنت متأكد؟', text: "سيتم حذف الطالب وجميع ارتباطاته نهائياً!", icon: 'warning', showCancelButton: true, confirmButtonColor: '#EE5D50', cancelButtonColor: '#A3AED0', confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء' }).then(async (result) => { if (result.isConfirmed) { await db.ref('students/' + sId).remove(); for(let tId in allAssignments) { if(allAssignments[tId][sId]) await db.ref(`assignments/${tId}/${sId}`).remove(); } showToast('تم الحذف وتنظيف السجلات'); } }); }
         async function deleteTeacherBtn() { if(!currentViewingTeacherId) return; const tId = currentViewingTeacherId; Swal.fire({ title: 'تأكيد الحذف النهائي', text: "سيتم حذف حساب الأستاذ ومستحقاته!", icon: 'error', showCancelButton: true, confirmButtonColor: '#EE5D50', cancelButtonColor: '#A3AED0', confirmButtonText: 'احذف نهائياً', cancelButtonText: 'إلغاء' }).then(async (result) => { if (result.isConfirmed) { await db.ref('teachers/' + tId).remove(); await db.ref('users/' + tId).remove(); await db.ref('assignments/' + tId).remove(); closeTeacherProfile(); showToast('تم حذف الأستاذ بنجاح'); } }); }
         
         function openEditStudentModal(sId) { const s = allStudents[sId]; if(!s) return; document.getElementById('edit_s_id').value = sId; document.getElementById('edit_s_name').value = s.name || ''; document.getElementById('edit_s_phone').value = s.phone || ''; document.getElementById('edit_s_course_name').value = s.courseName || ''; document.getElementById('edit_s_total_price').value = s.coursePrice || 0; let mMatch = (s.duration||'').match(/(\d+)\s*شهر/); let dMatch = (s.duration||'').match(/(\d+)\s*يوم/); document.getElementById('edit_s_duration_months').value = mMatch ? mMatch[1] : 0; document.getElementById('edit_s_duration_days').value = dMatch ? dMatch[1] : 0; openModal('editStudentModal'); }
         async function saveStudentEdit() { const id = document.getElementById('edit_s_id').value, name = document.getElementById('edit_s_name').value.trim(), phone = document.getElementById('edit_s_phone').value.trim(), courseName = document.getElementById('edit_s_course_name').value.trim(), totalP = parseFloat(document.getElementById('edit_s_total_price').value) || 0, m = parseInt(document.getElementById('edit_s_duration_months').value) || 0, d = parseInt(document.getElementById('edit_s_duration_days').value) || 0; if(!name) return showToast('اسم الطالب مطلوب!', 'error'); let durationText = (m>0&&d>0) ? `${m} شهر و ${d} يوم` : (m>0) ? `${m} شهر` : (d>0) ? `${d} يوم` : "غير محدد"; await db.ref('students/' + id).update({ name, phone, courseName: courseName || 'بدون تحديد', coursePrice: totalP, duration: durationText }); for(let tId in allAssignments) { if(allAssignments[tId][id]) await db.ref(`assignments/${tId}/${id}`).update({ courseName: courseName || 'بدون تحديد' }); } closeModal('editStudentModal'); showToast('تم التحديث بنجاح'); }
 
-        // عمليات الدفع والتوزيع 
         function openPaymentModal(sId, sName) { document.getElementById('pay_s_id').value = sId; document.getElementById('pay_s_name').innerText = `الطالب: ${sName}`; openModal('paymentModal'); }
         async function savePayment() { const sId = document.getElementById('pay_s_id').value, amount = parseFloat(document.getElementById('pay_amount').value); if(!amount || amount <= 0) { showToast('يرجى إدخال مبلغ صحيح', 'error'); return; } const dateStr = new Date().toLocaleDateString('ar-IQ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); await db.ref(`students/${sId}/payments`).push({ amount: amount, date: dateStr, note: 'تسديد دفعة' }); db.ref(`students/${sId}/paidAmount`).transaction(current => (current || 0) + amount); closeModal('paymentModal'); showToast('تم استلام الدفعة بنجاح'); }
         function viewHistory(sId, sName) { document.getElementById('hist_s_name').innerText = `السجل المالي: ${sName}`; const timeline = document.getElementById('paymentsTimeline'); timeline.innerHTML = ''; const payments = allStudents[sId]?.payments || {}; const keys = Object.keys(payments); if(keys.length === 0) { timeline.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-weight:700; padding:20px;">لا توجد حركات مسجلة.</p>'; } else { keys.reverse().forEach((key, index) => { const p = payments[key]; timeline.innerHTML += `<div class="timeline-item" style="animation-delay: ${index * 0.1}s"><div class="timeline-dot"></div><div class="timeline-content"><h4>${formatMoney(p.amount)}</h4><p><i class="fa-regular fa-calendar" style="color:var(--primary); margin-left:5px;"></i> ${p.date} &nbsp;|&nbsp; ${p.note}</p></div></div>`; }); } openModal('historyModal'); }
+        
         function openSmartAssign(sId, sName, courseName) { document.getElementById('smart_s_id').value = sId; document.getElementById('smart_s_name').innerText = `${sName} (كورس: ${courseName})`; const sel = document.getElementById('smart_t_id'); sel.innerHTML = '<option value="">-- حدد الأستاذ --</option>'; for(let tId in allTeachers) sel.innerHTML += `<option value="${tId}">${allTeachers[tId].name}</option>`; openModal('smartAssignModal'); }
         async function saveSmartAssignment() { const sId = document.getElementById('smart_s_id').value, tId = document.getElementById('smart_t_id').value, price = document.getElementById('smart_price').value, time = document.getElementById('smart_time').value; if(!tId || !price) return showToast('يرجى التحديد!', 'error'); const checkboxes = document.querySelectorAll('.days-grid input[type="checkbox"]:checked'); let selectedDays = []; checkboxes.forEach(cb => selectedDays.push(cb.value)); let scheduleStr = ""; if(selectedDays.length > 0 && time) { scheduleStr = `${selectedDays.join('، ')} الساعة ${time}`; } else if (selectedDays.length > 0 || time) { return showToast('أكمل الجدولة أو اتركها فارغة!', 'error'); } await db.ref(`assignments/${tId}/${sId}`).set({ courseName: allStudents[sId].courseName || 'غير محدد', lessonRate: parseFloat(price), schedule: scheduleStr }); closeModal('smartAssignModal'); showToast('تم التوزيع بنجاح'); }
         async function saveStudent() { const id = document.getElementById('s_id').value.trim(), name = document.getElementById('s_name').value.trim(), phone = document.getElementById('s_phone').value.trim(), courseName = document.getElementById('s_course_name').value.trim(), totalP = parseFloat(document.getElementById('s_total_price').value) || 0, paidP = parseFloat(document.getElementById('s_paid').value) || 0, m = parseInt(document.getElementById('s_duration_months').value) || 0, d = parseInt(document.getElementById('s_duration_days').value) || 0; if(!id || !name) return showToast('بيانات مفقودة!', 'error'); let durationText = (m>0&&d>0) ? `${m} شهر و ${d} يوم` : (m>0) ? `${m} شهر` : (d>0) ? `${d} يوم` : "غير محدد"; await db.ref('students/' + id).set({ name, phone, courseName: courseName || 'بدون تحديد', coursePrice: totalP, paidAmount: paidP, duration: durationText }); if(paidP > 0) { const dateStr = new Date().toLocaleDateString('ar-IQ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); await db.ref(`students/${id}/payments`).push({ amount: paidP, date: dateStr, note: 'دفعة أولى' }); } closeModal('addStudentModal'); showToast('تم التسجيل'); }
 
-        // Listener للطلبة
         db.ref('students').on('value', snap => {
             allStudents = snap.val() || {}; document.getElementById('totalStudentsCount').innerText = Object.keys(allStudents).length;
             const sContainer = document.getElementById('studentsContainer'), subContainer = document.getElementById('subscriptionsContainer'), dsContainer = document.getElementById('distStudentsContainer'); sContainer.innerHTML = ''; subContainer.innerHTML = ''; dsContainer.innerHTML = ''; let delay = 0;
@@ -630,7 +613,7 @@
             updateChartAndTable(); if(currentViewingTeacherId) refreshTeacherProfileUI();
         });
 
-        // Listener الأساتذة والتوزيع 
+        // دوال الأستاذ مع سجل التسديدات الجديد
         async function saveTeacher() { const id=document.getElementById('t_id').value, name=document.getElementById('t_name').value, pass=document.getElementById('t_pass').value; if(id && name && pass) { await db.ref('users/'+id).set({name,password:pass,role:'teacher'}); await db.ref('teachers/'+id).set({name,totalDue:0}); closeModal('addTeacherModal'); showToast('تم إضافة الأستاذ'); } else { showToast('املأ الحقول', 'error'); } }
         function openTeacherProfile(tId) { currentViewingTeacherId = tId; document.getElementById('teachersGridArea').style.display = 'none'; document.getElementById('teacherProfileArea').style.display = 'block'; refreshTeacherProfileUI(); }
         function closeTeacherProfile() { currentViewingTeacherId = null; document.getElementById('teacherProfileArea').style.display = 'none'; document.getElementById('teachersGridArea').style.display = 'block'; }
@@ -643,8 +626,33 @@
         }
         function openEditTeacherModal() { document.getElementById('edit_t_name').value = allTeachers[currentViewingTeacherId].name; openModal('editTeacherModal'); }
         async function saveTeacherEdit() { const name = document.getElementById('edit_t_name').value, pass = document.getElementById('edit_t_pass').value; if(name) { await db.ref(`teachers/${currentViewingTeacherId}/name`).set(name); await db.ref(`users/${currentViewingTeacherId}/name`).set(name); } if(pass) await db.ref(`users/${currentViewingTeacherId}/password`).set(pass); closeModal('editTeacherModal'); showToast('تم التحديث');}
+        
         function openSettleModal() { openModal('settleTeacherModal'); }
-        async function confirmSettle() { const amt = parseFloat(document.getElementById('settle_amount').value); if(amt > 0) { await db.ref(`teachers/${currentViewingTeacherId}/totalDue`).transaction(curr => (curr||0) - amt); closeModal('settleTeacherModal'); showToast('تم التسديد');} }
+        async function confirmSettle() { 
+            const amt = parseFloat(document.getElementById('settle_amount').value); 
+            const note = document.getElementById('settle_note').value.trim() || 'تسديد مستحقات';
+            if(amt > 0) { 
+                const dateStr = new Date().toLocaleDateString('ar-IQ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                await db.ref(`teachers/${currentViewingTeacherId}/payments`).push({ amount: amt, date: dateStr, note: note });
+                await db.ref(`teachers/${currentViewingTeacherId}/totalDue`).transaction(curr => (curr||0) - amt); 
+                closeModal('settleTeacherModal'); 
+                showToast('تم تسديد المستحقات وتسجيلها بنجاح');
+            } else {
+                showToast('يرجى إدخال مبلغ صحيح', 'error');
+            }
+        }
+
+        function viewTeacherHistory() {
+            if(!currentViewingTeacherId) return;
+            const t = allTeachers[currentViewingTeacherId];
+            document.getElementById('hist_t_name').innerText = `السجل المالي: ${t.name}`;
+            const timeline = document.getElementById('teacherPaymentsTimeline'); timeline.innerHTML = '';
+            const payments = t.payments || {}; const keys = Object.keys(payments);
+            if(keys.length === 0) { timeline.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-weight:700; padding:20px;">لا توجد دفعات مسجلة لهذا الأستاذ.</p>'; } 
+            else { keys.reverse().forEach((key, index) => { const p = payments[key]; timeline.innerHTML += `<div class="timeline-item" style="animation-delay: ${index * 0.1}s"><div class="timeline-dot"></div><div class="timeline-content"><h4 style="color:var(--success);">${formatMoney(p.amount)}</h4><p><i class="fa-regular fa-calendar" style="color:var(--primary); margin-left:5px;"></i> ${p.date} &nbsp;|&nbsp; ${p.note}</p></div></div>`; }); }
+            openModal('teacherHistoryModal');
+        }
+
         async function removeAssignment(tId, sId) { if(confirm("فك ارتباط الطالب بالأستاذ؟")) { await db.ref(`assignments/${tId}/${sId}`).remove(); showToast('تم الإلغاء'); } }
         
         db.ref('teachers').on('value', snap => {
