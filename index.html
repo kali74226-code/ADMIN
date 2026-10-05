@@ -46,6 +46,8 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
         body { background-color: var(--bg-color); color: var(--text-main); display: flex; height: 100vh; overflow: hidden; }
 
+        div:where(.swal2-container) { z-index: 100000 !important; }
+
         /* تسجيل الدخول */
         #loginOverlay { position: fixed; inset: 0; background: var(--bg-color); z-index: 9999; display: flex; justify-content: center; align-items: center; transition: opacity 0.6s ease; backdrop-filter: blur(10px); }
         .login-box { background: var(--white); padding: 50px 40px; border-radius: 30px; box-shadow: var(--shadow-soft); width: 420px; text-align: center; }
@@ -63,6 +65,7 @@
         .sidebar { width: 280px; background: var(--white); box-shadow: 14px 17px 40px 4px rgba(112, 144, 176, 0.08); display: flex; flex-direction: column; padding: 40px 20px; z-index: 10; border-radius: 30px 0 0 30px; margin: 20px 20px 20px 0; overflow-y:auto; }
         .sidebar::-webkit-scrollbar { width: 4px; } .sidebar::-webkit-scrollbar-thumb { background: #E0E5F2; border-radius: 10px; }
         .logo { font-size: 26px; font-weight: 900; color: var(--text-main); text-align: center; margin-bottom: 40px; display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .logo i { color: var(--primary); font-size: 32px; }
         .nav-items { list-style: none; display: flex; flex-direction: column; gap: 8px; flex: 1; }
         .nav-item { padding: 14px 18px; border-radius: 16px; cursor: pointer; font-weight: 700; color: var(--text-muted); transition: var(--transition); display: flex; align-items: center; gap: 14px; font-size: 14px; }
         .nav-item i { font-size: 18px; transition: var(--transition); width: 25px; text-align: center; }
@@ -79,7 +82,7 @@
         .header h1 { font-size: 24px; font-weight: 900; }
         .header p { color: var(--text-muted); font-size: 13px; font-weight: 600; margin-top: 5px; }
         .profile-section { display: flex; align-items: center; gap: 18px; }
-        .profile-img { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #868CFF); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 20px; }
+        .profile-img { width: 50px; height: 50px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #868CFF); display: flex; align-items: center; justify-content: center; color: var(--white); font-size: 20px; box-shadow: 0 10px 20px rgba(67, 24, 255, 0.3); }
 
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -176,7 +179,7 @@
         table.dataTable tbody td { font-family: 'Cairo'; font-weight: 600; font-size: 13px; padding: 15px !important; border-bottom: 1px solid #F4F7FE;}
         
         /* النوافذ (Modals) */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 20, 55, 0.5); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.4s; overflow-y: auto; padding: 20px; }
+        .modal-overlay { position: fixed; inset: 0; background: rgba(11, 20, 55, 0.5); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 10000; opacity: 0; transition: opacity 0.4s; overflow-y: auto; padding: 20px; }
         .modal { background: var(--white); width: 100%; max-width: 500px; padding: 35px; border-radius: 24px; transform: scale(0.9) translateY(20px); transition: var(--transition); box-shadow: 0 30px 60px rgba(0,0,0,0.15); margin: auto; }
         .modal.modal-lg { max-width: 700px; }
         .modal.show { transform: scale(1) translateY(0); }
@@ -209,11 +212,11 @@
         .timeline-content { background: var(--white); padding: 18px 22px; border-radius: 16px; flex: 1; border: 1px solid #F4F7FE; box-shadow: var(--shadow-soft); transition: var(--transition); }
 
         /* Toasts التنبيهات */
-        #toast-container { position: fixed; bottom: 30px; left: 30px; z-index: 100000; display: flex; flex-direction: column; gap: 15px; }
-        .toast { background: var(--white); border-radius: 16px; padding: 16px 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 15px; transform: translateX(-100%); opacity: 0; animation: slideToastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; border-right: 5px solid var(--primary); }
+        #toast-container { position: fixed; bottom: 30px; left: 30px; z-index: 100001 !important; display: flex; flex-direction: column; gap: 15px; }
+        .toast { background: var(--white); border-radius: 16px; padding: 16px 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 15px; transform: translateX(-100%); opacity: 0; animation: slideToastIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; border-right: 5px solid var(--primary); }
         .toast.toast-success { border-right-color: var(--success); }
         .toast.toast-error { border-right-color: var(--danger); }
-        .toast i { font-size: 24px; }
+        .toast i { font-size: 22px; }
         .toast.toast-success i { color: var(--success); }
         .toast.toast-error i { color: var(--danger); }
         .toast-content h5 { font-size: 15px; font-weight: 800; color: var(--text-main); margin-bottom: 3px; }
@@ -284,7 +287,7 @@
                 <button class="btn-primary" onclick="openTeacherAddStudentModal()"><i class="fa-solid fa-user-plus"></i> تسجيل طالب جديد</button>
             </div>
             <div id="tpAdminFilter" style="display:none; margin-bottom: 25px; background:var(--white); padding:20px; border-radius:16px; box-shadow:var(--shadow-soft);">
-                <label style="font-weight:800; font-size:14px; margin-bottom:10px; display:block;">اختر الأستاذ لعرض وإدارة طلابه:</label>
+                <label style="font-weight:800; font-size:14px; margin-bottom:10px; display:block;">أنت بصلاحية (موظف إدخال) - اختر الأستاذ لعرض وإدارة طلابه:</label>
                 <select id="tpFilterSelect" onchange="renderTeacherPortal()" style="width:100%; padding:12px; border-radius:12px; border:2px solid #E0E5F2; font-family:'Cairo'; font-weight:700; outline:none;"></select>
             </div>
             <div class="grid-list" id="teacherStudentsContainer"></div>
@@ -329,7 +332,7 @@
 
         <!-- 8. إدارة المستخدمين -->
         <section id="usersView" class="view-section">
-            <div class="section-header"><h2>إدارة موظفي النظام والصلاحيات</h2><button class="btn-primary" onclick="openModal('addUserModal')"><i class="fa-solid fa-user-shield"></i> إنشاء حساب موظف</button></div>
+            <div class="section-header"><h2>إدارة موظفي النظام والصلاحيات</h2><button class="btn-primary" onclick="openAddUserModalWrapper()"><i class="fa-solid fa-user-shield"></i> إنشاء حساب موظف</button></div>
             <div class="grid-list" id="usersContainer"></div>
         </section>
     </main>
@@ -370,7 +373,15 @@
             <input type="hidden" id="u_edit_mode" value="0">
             <div class="form-row"><div class="form-group"><label>اسم الدخول (المعرف)</label><input type="text" id="u_username"></div><div class="form-group"><label>الاسم الظاهر</label><input type="text" id="u_name"></div></div>
             <div class="form-row"><div class="form-group"><label>كلمة المرور</label><input type="password" id="u_pass"></div></div>
-            <hr style="border:0; border-top:2px dashed #E0E5F2; margin:10px 0;">
+            
+            <hr style="border:0; border-top:2px dashed #E0E5F2; margin:15px 0;">
+            <h4 style="font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:10px;">ربط الموظف بأساتذة (لتحديد نطاق عمله - Isolation)</h4>
+            <p style="font-size: 11px; color: var(--danger); margin-top: -5px; margin-bottom: 10px;">* إذا لم يتم تحديد أي أستاذ للموظف، فلن يرى أي بيانات للطلاب أو الأساتذة!</p>
+            <div class="days-grid" id="u_linked_teachers_container" style="max-height: 120px; overflow-y: auto; padding: 10px; background: #F4F7FE; border-radius: 12px; border: 2px solid #E0E5F2;">
+                <!-- سيعبأ برمجياً -->
+            </div>
+
+            <hr style="border:0; border-top:2px dashed #E0E5F2; margin:15px 0;">
             <h4 style="font-size:15px; font-weight:800; color:var(--text-main); margin-bottom:10px;">لوحة الصلاحيات التفصيلية</h4>
             <div class="perm-grid">
                 <label class="perm-item" style="color:var(--primary);"><input type="checkbox" id="perm_teacher_portal"> بوابة إدخال الطلاب والمحاضرات (مخصصة)</label>
@@ -383,7 +394,7 @@
                 <label class="perm-item"><input type="checkbox" id="perm_finance_pay"> استلام دفعات الطلاب</label>
                 <label class="perm-item"><input type="checkbox" id="perm_assign_manage"> التوزيع وتسعير الكورس (الإدارة)</label>
                 <label class="perm-item"><input type="checkbox" id="perm_logs_view"> عرض السجل الشامل للإكسل</label>
-                <label class="perm-item" style="color:var(--danger); grid-column:1/-1;"><input type="checkbox" id="perm_is_super"> مدير عام (كافة الصلاحيات المطلقة)</label>
+                <label class="perm-item" style="color:var(--danger); grid-column:1/-1;"><input type="checkbox" id="perm_is_super"> مدير عام (كافة الصلاحيات وعرض كل الأساتذة)</label>
             </div>
             <div class="modal-actions"><button class="btn-cancel" onclick="closeModal('addUserModal')">إلغاء</button><button class="btn-save" onclick="saveUser()">حفظ الموظف</button></div>
         </div>
@@ -396,7 +407,7 @@
     <div class="modal-overlay" id="teacherHistoryModal"><div class="modal modal-lg"><h2>سجل دفعات الأستاذ</h2><p id="hist_t_name" style="text-align:center; color:var(--primary); font-weight:800; font-size:16px; margin-bottom:10px;"></p><div class="timeline" id="teacherPaymentsTimeline"></div><div class="modal-actions"><button class="btn-cancel" style="flex:1;" onclick="closeModal('teacherHistoryModal')">إغلاق</button></div></div></div>
 
     <!-- نوافذ الإدارة (الطلاب، الدفع، التوزيع) -->
-    <div class="modal-overlay" id="addStudentModal"><div class="modal modal-lg"><h2>تسجيل طالب واشتراك جديد (للإدارة)</h2><div class="form-row"><div class="form-group"><label>المعرف (ID)</label><input type="text" id="s_id" placeholder="مثال: S001"></div><div class="form-group"><label>الاسم الكامل</label><input type="text" id="s_name"></div></div><div class="form-row"><div class="form-group"><label>رقم الهاتف</label><input type="text" id="s_phone"></div><div class="form-group"><label>اسم الكورس / المادة</label><input type="text" id="s_course_name"></div></div><hr style="border:0; border-top:2px dashed #E0E5F2; margin:15px 0;"><div class="form-row"><div class="form-group"><label>سعر الكورس الإجمالي</label><input type="number" id="s_total_price"></div><div class="form-group"><label>المبلغ المدفوع (دفعة أولى)</label><input type="number" id="s_paid" value="0"></div></div><div class="form-row"><div class="form-group"><label>مدة الكورس (أشهر)</label><input type="number" id="s_duration_months" value="0"></div><div class="form-group"><label>مدة الكورس (أيام)</label><input type="number" id="s_duration_days" value="0"></div></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('addStudentModal')">إلغاء</button><button class="btn-save" onclick="saveStudent()">تسجيل واعتماد</button></div></div></div>
+    <div class="modal-overlay" id="addStudentModal"><div class="modal modal-lg"><h2>تسجيل طالب واشتراك جديد (للإدارة)</h2><div class="form-row"><div class="form-group"><label>المعرف (ID)</label><input type="text" id="s_id" placeholder="مثال: S001"></div><div class="form-group"><label>الاسم الكامل</label><input type="text" id="s_name"></div></div><div class="form-row"><div class="form-group"><label>رقم الهاتف</label><input type="text" id="s_phone"></div><div class="form-group"><label>اسم الكورس / المادة</label><input type="text" id="s_course_name"></div></div><hr style="border:0; border-top:2px dashed #E0E5F2; margin:15px 0;"><div class="form-row"><div class="form-group"><label>سعر الكورس الإجمالي</label><input type="number" id="s_total_price"></div><div class="form-group"><label>المبلغ المدفوع (دفعة أولى)</label><input type="number" id="s_paid" value="0"></div></div><div class="form-row"><div class="form-group"><label>مدة الكورس (أشهر)</label><input type="number" id="s_duration_months" value="0"></div><div class="form-group"><label>مدة الكورس (أيام)</label><input type="number" id="s_duration_days" value="0"></div></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('addStudentModal')">إلغاء</button><button class="btn-save" onclick="saveAdminStudent()">تسجيل واعتماد</button></div></div></div>
     <div class="modal-overlay" id="editStudentModal"><div class="modal modal-lg"><h2>تعديل بيانات أو تسعير الطالب</h2><input type="hidden" id="edit_s_id"><div class="form-row"><div class="form-group"><label>الاسم الكامل</label><input type="text" id="edit_s_name"></div><div class="form-group"><label>رقم الهاتف</label><input type="text" id="edit_s_phone"></div></div><div class="form-row"><div class="form-group"><label>اسم الكورس / المادة</label><input type="text" id="edit_s_course_name"></div><div class="form-group"><label>سعر الكورس الإجمالي</label><input type="number" id="edit_s_total_price"></div></div><div class="form-row"><div class="form-group"><label>مدة الكورس (أشهر)</label><input type="number" id="edit_s_duration_months" value="0"></div><div class="form-group"><label>مدة الكورس (أيام)</label><input type="number" id="edit_s_duration_days" value="0"></div></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('editStudentModal')">إلغاء</button><button class="btn-save" onclick="saveStudentEdit()">حفظ التعديلات</button></div></div></div>
     <div class="modal-overlay" id="paymentModal"><div class="modal"><h2>استلام دفعة واردة</h2><input type="hidden" id="pay_s_id"><p id="pay_s_name" style="text-align:center; color:var(--text-muted); font-weight:800; margin-bottom:20px;"></p><div class="form-group"><label>المبلغ المسدد الآن</label><input type="number" id="pay_amount"></div><div class="modal-actions"><button class="btn-cancel" onclick="closeModal('paymentModal')">إلغاء</button><button class="btn-save btn-success" onclick="savePayment()">تأكيد الاستلام</button></div></div></div>
     <div class="modal-overlay" id="historyModal"><div class="modal modal-lg"><h2>السجل المالي المفصل</h2><p id="hist_s_name" style="text-align:center; color:var(--primary); font-weight:900; margin-bottom:10px;"></p><div class="timeline" id="paymentsTimeline"></div><div class="modal-actions"><button class="btn-cancel" style="flex:1;" onclick="closeModal('historyModal')">إغلاق</button></div></div></div>
@@ -423,20 +434,16 @@
         let currentViewingTeacherId = null; let myChart = null; let studentStatusChart = null; let collectionRateChart = null; let dataTable;
         let currentUser = null; 
 
-        // استرجاع الجلسة عند تحميل الصفحة
         window.addEventListener('DOMContentLoaded', () => {
             const savedSession = localStorage.getItem('cambridgeSession');
             if(savedSession) {
-                try {
-                    currentUser = JSON.parse(savedSession);
-                    loginSuccess(true);
-                } catch(e) { console.error(e); }
+                try { currentUser = JSON.parse(savedSession); loginSuccess(true); } catch(e) { console.error(e); }
             }
         });
 
         async function checkLogin() {
             const u = document.getElementById('loginUser').value.trim(), p = document.getElementById('loginPass').value.trim();
-            if(!u || !p) return showToast('يرجى إدخال اسم المستخدم وكلمة المرور!', 'error');
+            if(!u || !p) return Swal.fire({ title: 'فشل الدخول', text: 'يرجى إدخال اسم المستخدم وكلمة المرور!', icon: 'error', confirmButtonColor: '#EE5D50', confirmButtonText: 'حسناً' });
 
             const adminSnap = await db.ref('admins/' + u).once('value'); const adminData = adminSnap.val();
             if(u === 'admin' && p === 'admin' && !adminData) {
@@ -458,7 +465,6 @@
                 return loginSuccess();
             }
             
-            // إظهار تنبيه أحمر صارم عند الخطأ
             Swal.fire({ title: 'فشل الدخول', text: 'اسم المستخدم أو كلمة المرور غير صحيحة!', icon: 'error', confirmButtonColor: '#EE5D50', confirmButtonText: 'حسناً' });
         }
 
@@ -482,6 +488,27 @@
             if(currentUser.role === 'teacher') return false; 
             if(currentUser.isSuper) return true;
             return currentUser.perms && currentUser.perms[action] === true;
+        }
+
+        function isTeacherAllowed(tId) {
+            if(!currentUser) return false;
+            if(currentUser.isSuper || currentUser.role === 'teacher') return true;
+            if(!currentUser.perms || !currentUser.perms.linkedTeachers || currentUser.perms.linkedTeachers.length === 0) return false;
+            return currentUser.perms.linkedTeachers.includes(tId);
+        }
+
+        function isStudentAllowed(sId) {
+            if(!currentUser) return false;
+            if(currentUser.isSuper || currentUser.role === 'teacher') return true;
+            
+            // Check if student belongs to any of the linked teachers
+            for(let tId in allAssignments) {
+                if(isTeacherAllowed(tId) && allAssignments[tId][sId]) return true;
+            }
+            // Fallback: If the employee added the student themselves but hasn't assigned them yet
+            if(allStudents[sId] && allStudents[sId].addedBy === currentUser.id) return true;
+
+            return false;
         }
 
         function loginSuccess(isRestore = false) {
@@ -519,7 +546,7 @@
             if(currentUser.role === 'teacher') {
                 menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-chalkboard-user"></i> طلابي ومحاضراتي</li>`;
             } else {
-                if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة التسجيل والمحاضرات</li>`;
+                if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة الإدخال والمحاضرات</li>`;
                 if(currentUser.isSuper || hasPerm('teachers_view') || hasPerm('students_view') || hasPerm('finance_view') || hasPerm('logs_view')) {
                     menu.innerHTML += `<li class="nav-item ${!hasPerm('teacher_portal')?'active':''}" onclick="switchView('dashboardView', this)"><i class="fa-solid fa-chart-pie"></i> الرئيسية</li>`;
                 }
@@ -549,6 +576,23 @@
         function closeModal(modalId) { const m = document.getElementById(modalId); m.style.opacity = '0'; m.querySelector('.modal').classList.remove('show'); setTimeout(() => { m.style.display = 'none'; m.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"])').forEach(i=>i.value=''); m.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false); }, 400); }
 
         // ================= إدارة الموظفين =================
+        function populateLinkedTeachers(linkedArr = []) {
+            const container = document.getElementById('u_linked_teachers_container'); container.innerHTML = '';
+            for(let tId in allTeachers) {
+                const isChecked = linkedArr.includes(tId) ? 'checked' : '';
+                container.innerHTML += `<label class="day-chip" style="width: auto; flex: none; margin: 3px;"><input type="checkbox" value="${tId}" class="linked-teacher-cb" ${isChecked}><span>${allTeachers[tId].name}</span></label>`;
+            }
+        }
+
+        function openAddUserModalWrapper() {
+            document.getElementById('u_edit_mode').value = '0';
+            document.getElementById('u_username').value = ''; document.getElementById('u_username').disabled = false;
+            document.getElementById('u_name').value = ''; document.getElementById('u_pass').value = '';
+            document.querySelectorAll('.perm-item input[type="checkbox"]').forEach(cb => cb.checked = false);
+            populateLinkedTeachers([]);
+            openModal('addUserModal');
+        }
+
         function openEditUserModal(uId) {
             if(!currentUser.isSuper) return;
             const adm = allAdmins[uId]; if(!adm) return;
@@ -567,6 +611,8 @@
             document.getElementById('perm_finance_pay').checked = adm.perms?.finance_pay || false;
             document.getElementById('perm_assign_manage').checked = adm.perms?.assign_manage || false;
             document.getElementById('perm_logs_view').checked = adm.perms?.logs_view || false;
+            
+            populateLinkedTeachers(adm.perms?.linkedTeachers || []);
             openModal('addUserModal');
         }
 
@@ -582,11 +628,26 @@
             const n = document.getElementById('u_name').value.trim(), p = document.getElementById('u_pass').value.trim();
             if(!u || !n || !p) return showToast('املأ الحقول الأساسية', 'error');
             
+            let linkedArr = []; document.querySelectorAll('.linked-teacher-cb:checked').forEach(cb => linkedArr.push(cb.value));
+
             const isSuper = document.getElementById('perm_is_super').checked;
-            const perms = { teacher_portal: document.getElementById('perm_teacher_portal').checked, teachers_view: document.getElementById('perm_teachers_view').checked, teachers_manage: document.getElementById('perm_teachers_manage').checked, teachers_settle: document.getElementById('perm_teachers_settle').checked, students_view: document.getElementById('perm_students_view').checked, students_manage: document.getElementById('perm_students_manage').checked, finance_view: document.getElementById('perm_finance_view').checked, finance_pay: document.getElementById('perm_finance_pay').checked, assign_manage: document.getElementById('perm_assign_manage').checked, logs_view: document.getElementById('perm_logs_view').checked };
+            const perms = { 
+                teacher_portal: document.getElementById('perm_teacher_portal').checked, 
+                teachers_view: document.getElementById('perm_teachers_view').checked, 
+                teachers_manage: document.getElementById('perm_teachers_manage').checked, 
+                teachers_settle: document.getElementById('perm_teachers_settle').checked, 
+                students_view: document.getElementById('perm_students_view').checked, 
+                students_manage: document.getElementById('perm_students_manage').checked, 
+                finance_view: document.getElementById('perm_finance_view').checked, 
+                finance_pay: document.getElementById('perm_finance_pay').checked, 
+                assign_manage: document.getElementById('perm_assign_manage').checked, 
+                logs_view: document.getElementById('perm_logs_view').checked,
+                linkedTeachers: linkedArr
+            };
+            
             await db.ref('admins/' + u).set({ name: n, password: p, isSuper: isSuper, perms: perms }); 
             document.getElementById('u_edit_mode').value = '0'; document.getElementById('u_username').disabled = false;
-            closeModal('addUserModal'); showToast('تم الحفظ بنجاح');
+            closeModal('addUserModal'); showToast('تم حفظ الموظف والصلاحيات بنجاح');
         }
 
         // ================= بوابة الإدخال (للأستاذ وللموظف) =================
@@ -594,7 +655,9 @@
             if(currentUser.role === 'admin') {
                 document.getElementById('ts_admin_teacher_select_div').style.display = 'flex';
                 const sel = document.getElementById('ts_teacher_select'); sel.innerHTML = '<option value="">-- إلزامي: حدد الأستاذ --</option>';
-                for(let tId in allTeachers) sel.innerHTML += `<option value="${tId}">${allTeachers[tId].name}</option>`;
+                for(let tId in allTeachers) {
+                    if(isTeacherAllowed(tId)) { sel.innerHTML += `<option value="${tId}">${allTeachers[tId].name}</option>`; }
+                }
             } else { document.getElementById('ts_admin_teacher_select_div').style.display = 'none'; }
             openModal('teacherAddStudentModal');
         }
@@ -674,11 +737,11 @@
             }
         }
 
-        // ================= الإدارة המباشرة (المدير) =================
+        // ================= الإدارة المباشرة للمدير والقيود (Admin Listeners) =================
         function setupRealtimeListenersAdmin() {
             db.ref('admins').on('value', snap => {
                 if(!currentUser.isSuper) return; allAdmins = snap.val() || {}; const uContainer = document.getElementById('usersContainer'); uContainer.innerHTML = '';
-                for(let u in allAdmins) { if(u === 'admin' && allAdmins[u].name === 'المدير العام') continue; const adm = allAdmins[u]; uContainer.innerHTML += `<div class="data-card"><div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="openEditUserModal('${u}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="deleteUserBtnAction('${u}')"><i class="fa-solid fa-trash"></i></button></div><div class="c-header" style="margin-top:15px;"><div class="c-icon icon-purple"><i class="fa-solid fa-user-shield"></i></div><div class="c-info"><h4>${adm.name}</h4><p>المعرف: ${u} | ${adm.isSuper?'مدير عام':'موظف'}</p></div></div></div>`; }
+                for(let u in allAdmins) { if(u === 'admin' && allAdmins[u].name === 'المدير العام') continue; const adm = allAdmins[u]; uContainer.innerHTML += `<div class="data-card"><div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="openEditUserModal('${u}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="deleteUserBtnAction('${u}')"><i class="fa-solid fa-trash"></i></button></div><div class="c-header" style="margin-top:15px;"><div class="c-icon icon-purple"><i class="fa-solid fa-user-shield"></i></div><div class="c-info"><h4>${adm.name}</h4><p>المعرف: ${u} | ${adm.isSuper?'مدير عام':'موظف إدخال'}</p></div></div></div>`; }
             });
 
             db.ref('teachers').on('value', snap => {
@@ -687,36 +750,49 @@
                 if(tpSelect) {
                     const currentVal = tpSelect.value;
                     tpSelect.innerHTML = '<option value="">-- اختر الأستاذ لعرض وإدارة طلابه --</option>';
-                    for(let tId in allTeachers) tpSelect.innerHTML += `<option value="${tId}">${allTeachers[tId].name}</option>`;
+                    for(let tId in allTeachers) {
+                        if(isTeacherAllowed(tId)) { tpSelect.innerHTML += `<option value="${tId}">${allTeachers[tId].name}</option>`; }
+                    }
                     if(currentVal) tpSelect.value = currentVal;
                 }
 
                 let tCount = 0; let totalDue = 0; const tContainer = document.getElementById('teachersContainer'); if(tContainer) tContainer.innerHTML = ''; let delay = 0;
-                
                 for(let tId in allTeachers) { 
+                    if(!isTeacherAllowed(tId)) continue; // قيد الأساتذة!
+                    
                     tCount++; const t = allTeachers[tId]; totalDue += (t.totalDue || 0); 
                     if(hasPerm('teachers_view') || hasPerm('teachers_manage')) { 
                         let actionsTop = hasPerm('teachers_manage') ? `<div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="event.stopPropagation(); openEditTeacherModalDirect('${tId}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="event.stopPropagation(); deleteTeacherBtn('${tId}')"><i class="fa-solid fa-trash"></i></button></div>` : '';
                         tContainer.innerHTML += `<div class="data-card" style="cursor:pointer; animation-delay:${delay}s;" onclick="openTeacherProfile('${tId}')">${actionsTop}<div class="c-header" style="border:none; padding:0; margin-top:15px;"><div class="c-icon icon-purple"><i class="fa-solid fa-chalkboard-user"></i></div><div class="c-info"><h4>${t.name}</h4><p>انقر لإدارة ملفه وطلابه</p></div></div><div style="margin-top:5px; background:var(--bg-color); padding:15px; border-radius:16px; text-align:center;"><span style="font-size:13px; font-weight:700; color:var(--text-muted);">المستحقات الحالية</span><h3 style="color:var(--primary); font-size:22px; margin-top:5px;">${formatMoney(t.totalDue)}</h3></div></div>`; delay += 0.05; 
                     } 
                 }
+                
                 document.getElementById('totalTeachersCount').innerText = tCount; document.getElementById('totalFinancialDue').innerHTML = formatMoney(totalDue); 
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') { document.getElementById('tpAdminFilter').style.display = 'block'; renderTeacherPortal(); }
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
             });
 
+            db.ref('assignments').on('value', snap => { allAssignments = snap.val() || {}; if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); if(currentViewingTeacherId) refreshTeacherProfileUI(); });
+
             db.ref('students').on('value', snap => {
-                allStudents = snap.val() || {}; document.getElementById('totalStudentsCount').innerText = Object.keys(allStudents).length;
+                allStudents = snap.val() || {}; 
                 const sContainer = document.getElementById('studentsContainer'), subContainer = document.getElementById('subscriptionsContainer'), dsContainer = document.getElementById('distStudentsContainer');
-                sContainer.innerHTML = ''; subContainer.innerHTML = ''; dsContainer.innerHTML = ''; let delay = 0; let totalExpected = 0, totalCollected = 0, totalRemaining = 0; let tableData = []; let assignedCount = 0; let totalStudents = Object.keys(allStudents).length;
+                sContainer.innerHTML = ''; subContainer.innerHTML = ''; dsContainer.innerHTML = ''; let delay = 0; let totalExpected = 0, totalCollected = 0, totalRemaining = 0; let tableData = []; let assignedCount = 0; let allowedStudentsCount = 0;
 
                 for(let sId in allStudents) {
+                    if(!isStudentAllowed(sId)) continue; // قيد الطلاب!
+                    allowedStudentsCount++;
+
                     const s = allStudents[sId], price = s.coursePrice||0, paid = s.paidAmount||0, rem = price-paid, percentage = price > 0 ? (paid / price) * 100 : 0; 
                     const paymentsArr = Object.values(s.payments || {}); const lastPayDate = paymentsArr.length > 0 ? paymentsArr[paymentsArr.length - 1].date : 'لا توجد دفعات';
                     totalExpected += price; totalCollected += paid; totalRemaining += rem;
 
                     let assignedTeacherNames = []; let isAssigned = false; let attLecInfo = [];
-                    for(let tId in allAssignments) { if(allAssignments[tId][sId]) { assignedTeacherNames.push(allTeachers[tId] ? allTeachers[tId].name : 'محذوف'); isAssigned = true; attLecInfo.push(allAssignments[tId][sId].attendedLectures||0); } }
+                    for(let tId in allAssignments) { 
+                        if(allAssignments[tId][sId]) { 
+                            assignedTeacherNames.push(allTeachers[tId] ? allTeachers[tId].name : 'محذوف'); isAssigned = true; attLecInfo.push(allAssignments[tId][sId].attendedLectures||0); 
+                        } 
+                    }
                     if(isAssigned) assignedCount++;
                     let needsPricingMsg = ""; if(isAssigned && price === 0) needsPricingMsg = `<span style="color:var(--danger); font-size:11px; font-weight:800;"><i class="fa-solid fa-triangle-exclamation"></i> يحتاج تسعير الإدارة</span>`;
 
@@ -728,20 +804,19 @@
                     delay += 0.05;
                 }
                 
+                document.getElementById('totalStudentsCount').innerText = allowedStudentsCount;
                 if(myChart) { myChart.data.datasets[0].data = [totalExpected, totalCollected, totalRemaining]; myChart.update(); } document.getElementById('totalRevenue').innerHTML = formatMoney(totalExpected);
-                let unassignedCount = totalStudents - assignedCount; let assignPercent = totalStudents > 0 ? Math.round((assignedCount / totalStudents) * 100) : 0;
+                let unassignedCount = allowedStudentsCount - assignedCount; let assignPercent = allowedStudentsCount > 0 ? Math.round((assignedCount / allowedStudentsCount) * 100) : 0;
                 if(studentStatusChart) { studentStatusChart.data.datasets[0].data = [assignedCount, unassignedCount == 0 && assignedCount == 0 ? 1 : unassignedCount]; studentStatusChart.update(); } document.getElementById('assignedCount').innerText = assignedCount; document.getElementById('unassignedCount').innerText = unassignedCount; document.getElementById('studentStatusPercent').innerText = assignPercent + '%';
                 let colPercent = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0; if(collectionRateChart) { collectionRateChart.data.datasets[0].data = [totalCollected, totalRemaining == 0 && totalCollected == 0 ? 1 : totalRemaining]; collectionRateChart.update(); } document.getElementById('collectionRatePercent').innerText = colPercent + '%';
                 if(dataTable) { dataTable.clear(); dataTable.rows.add(tableData); dataTable.draw(); }
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal();
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
             });
-
-            db.ref('assignments').on('value', snap => { allAssignments = snap.val() || {}; updateChartAndTable(); if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); if(currentViewingTeacherId) refreshTeacherProfileUI(); });
         }
 
         // ================= الإدارة العامة (לلمدير) =================
-        async function saveStudent() {
+        async function saveAdminStudent() {
             if(!hasPerm('students_manage')) return showToast('ليس لديك صلاحية', 'error');
             const id = document.getElementById('s_id').value.trim(), name = document.getElementById('s_name').value.trim(), phone = document.getElementById('s_phone').value.trim(), courseName = document.getElementById('s_course_name').value.trim(), totalP = parseFloat(document.getElementById('s_total_price').value) || 0, paidP = parseFloat(document.getElementById('s_paid').value) || 0, m = parseInt(document.getElementById('s_duration_months').value) || 0, d = parseInt(document.getElementById('s_duration_days').value) || 0;
             if(!id || !name) return showToast('بيانات مفقودة!', 'error'); let durationText = (m>0&&d>0) ? `${m} شهر و ${d} يوم` : (m>0) ? `${m} شهر` : (d>0) ? `${d} يوم` : "غير محدد";
@@ -758,14 +833,14 @@
         async function savePayment() { const sId = document.getElementById('pay_s_id').value, amount = parseFloat(document.getElementById('pay_amount').value); if(!amount || amount <= 0) return showToast('مبلغ غير صحيح', 'error'); const dateStr = new Date().toLocaleDateString('ar-IQ', { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }); await db.ref(`students/${sId}/payments`).push({ amount: amount, date: dateStr, note: 'تسديد دفعة' }); db.ref(`students/${sId}/paidAmount`).transaction(current => (current || 0) + amount); closeModal('paymentModal'); showToast('تم الاستلام'); }
         function viewHistory(sId, sName) { document.getElementById('hist_s_name').innerText = `السجل المالي: ${sName}`; const timeline = document.getElementById('paymentsTimeline'); timeline.innerHTML = ''; const payments = allStudents[sId]?.payments || {}; const keys = Object.keys(payments); if(keys.length === 0) timeline.innerHTML = '<p style="text-align:center; color:var(--text-muted); font-weight:700; padding:20px;">لا توجد حركات مسجلة.</p>'; else keys.reverse().forEach((key, index) => { const p = payments[key]; timeline.innerHTML += `<div class="timeline-item" style="animation-delay: ${index * 0.1}s"><div class="timeline-dot"></div><div class="timeline-content"><h4>${formatMoney(p.amount)}</h4><p><i class="fa-regular fa-calendar" style="color:var(--primary); margin-left:5px;"></i> ${p.date} &nbsp;|&nbsp; ${p.note}</p></div></div>`; }); openModal('historyModal'); }
         
-        // التوزيع المحدث
+        // التوزيع والتسعير
         function openSmartAssign(sId, sName, courseName) { 
             if(!hasPerm('assign_manage')) return showToast('لا تملك صلاحية', 'error'); 
             document.getElementById('smart_s_id').value = sId; document.getElementById('smart_s_name').innerText = `${sName}`; 
             let existingTid = null; let existingRate = '';
             for(let tId in allAssignments) { if(allAssignments[tId][sId]) { existingTid = tId; existingRate = allAssignments[tId][sId].lessonRate || ''; break; } }
             const sel = document.getElementById('smart_t_id'); sel.innerHTML = '<option value="">-- حدد الأستاذ --</option>'; 
-            for(let tId in allTeachers) { let selected = (tId === existingTid) ? 'selected' : ''; sel.innerHTML += `<option value="${tId}" ${selected}>${allTeachers[tId].name}</option>`;  }
+            for(let tId in allTeachers) { if(isTeacherAllowed(tId)) { let selected = (tId === existingTid) ? 'selected' : ''; sel.innerHTML += `<option value="${tId}" ${selected}>${allTeachers[tId].name}</option>`; } }
             document.getElementById('smart_price').value = existingRate; openModal('smartAssignModal'); 
         }
 
@@ -825,26 +900,6 @@
                     showToast('تم الحذف'); 
                 }
             }); 
-        }
-
-        // دالة تحديث الشارتات المتكررة للتأكد
-        function updateChartAndTable() {
-            let totalExpected = 0, totalCollected = 0, totalRemaining = 0; let tableData = []; let assignedCount = 0; let totalStudents = Object.keys(allStudents).length;
-            for(let sId in allStudents) {
-                const s = allStudents[sId], price = s.coursePrice||0, paid = s.paidAmount||0, rem = price-paid; totalExpected += price; totalCollected += paid; totalRemaining += rem;
-                let assignedTeacherNames = []; let isAssigned = false; let attLecInfo = [];
-                for(let tId in allAssignments) { if(allAssignments[tId][sId]) { assignedTeacherNames.push(allTeachers[tId] ? allTeachers[tId].name : 'محذوف'); isAssigned = true; attLecInfo.push(allAssignments[tId][sId].attendedLectures||0); } }
-                if(isAssigned) assignedCount++;
-                tableData.push([sId, s.name, s.courseName || 'غير محدد', assignedTeacherNames.length > 0 ? assignedTeacherNames.join('، ') : 'غير مرتبط', formatMoneyRaw(price), formatMoneyRaw(paid), formatMoneyRaw(rem), s.duration || 'غير محدد', attLecInfo.join('، ') || '0']);
-            }
-            if(myChart) { myChart.data.datasets[0].data = [totalExpected, totalCollected, totalRemaining]; myChart.update(); } 
-            
-            let unassignedCount = totalStudents - assignedCount; let assignPercent = totalStudents > 0 ? Math.round((assignedCount / totalStudents) * 100) : 0;
-            if(studentStatusChart) { studentStatusChart.data.datasets[0].data = [assignedCount, unassignedCount == 0 && assignedCount == 0 ? 1 : unassignedCount]; studentStatusChart.update(); } 
-            
-            let colPercent = totalExpected > 0 ? Math.round((totalCollected / totalExpected) * 100) : 0; if(collectionRateChart) { collectionRateChart.data.datasets[0].data = [totalCollected, totalRemaining == 0 && totalCollected == 0 ? 1 : totalRemaining]; collectionRateChart.update(); } 
-            
-            if(dataTable) { dataTable.clear(); dataTable.rows.add(tableData); dataTable.draw(); }
         }
     </script>
 </body>
