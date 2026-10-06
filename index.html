@@ -656,7 +656,6 @@
                 setupRealtimeListenersTeacher();
             }
 
-            // فتح أول نافذة مسموحة تلقائياً
             const firstTab = document.getElementById('sidebarMenu').firstElementChild;
             if (firstTab) firstTab.click();
         }
@@ -666,14 +665,12 @@
             if(currentUser.role === 'teacher') {
                 menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-chalkboard-user"></i> طلابي ومحاضراتي</li>`;
             } else {
-                // ترتيب 1: الرئيسية 
                 if(currentUser.isSuper || hasPerm('teachers_view') || hasPerm('students_view') || hasPerm('finance_view') || hasPerm('logs_view')) {
                     menu.innerHTML += `<li class="nav-item" onclick="switchView('dashboardView', this)"><i class="fa-solid fa-chart-pie"></i> الرئيسية</li>`;
                 }
                 if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة الإدخال والمحاضرات</li>`;
                 if(hasPerm('teachers_view') || hasPerm('teachers_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teachersView', this)"><i class="fa-solid fa-chalkboard-user"></i> إدارة الأساتذة</li>`;
                 if(hasPerm('students_view') || hasPerm('students_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('studentsView', this)"><i class="fa-solid fa-users"></i> إدارة الطلبة</li>`;
-                // الأرشيف الجديد
                 if(hasPerm('students_view') || hasPerm('students_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('archiveView', this)"><i class="fa-solid fa-box-archive"></i> الأرشيف</li>`;
                 if(hasPerm('finance_view') || hasPerm('finance_pay')) menu.innerHTML += `<li class="nav-item" onclick="switchView('subscriptionsView', this)"><i class="fa-solid fa-wallet"></i> المالية والاشتراكات</li>`;
                 if(hasPerm('assign_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('distributionView', this)"><i class="fa-solid fa-network-wired"></i> التوزيع والجدولة</li>`;
@@ -872,8 +869,51 @@
                         </div>
                     </div>`; delay += 0.05;
             }
-            // إعادة تطبيق البحث إن وجد
             filterCards('search_tp', 'teacherStudentsContainer');
+        }
+
+        // --- دالة رسم كروت الأساتذة المنفصلة لتحديث العداد في الوقت الفعلي ---
+        function renderTeachersGrid() {
+            const tContainer = document.getElementById('teachersContainer'); if(!tContainer) return;
+            let tCount = 0; let totalDue = 0; tContainer.innerHTML = ''; let delay = 0;
+            
+            for(let tId in allTeachers) { 
+                if(!isTeacherAllowed(tId)) continue; 
+                
+                tCount++; 
+                const t = allTeachers[tId]; 
+                totalDue += (t.totalDue || 0); 
+                let sCount = allAssignments[tId] ? Object.keys(allAssignments[tId]).length : 0; // حساب عدد الطلاب المرتبطين بالأستاذ
+                
+                if(hasPerm('teachers_view') || hasPerm('teachers_manage')) { 
+                    let actionsTop = hasPerm('teachers_manage') ? `<div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="event.stopPropagation(); openEditTeacherModalDirect('${tId}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="event.stopPropagation(); deleteTeacherBtn('${tId}')"><i class="fa-solid fa-trash"></i></button></div>` : '';
+                    
+                    tContainer.innerHTML += `
+                    <div class="data-card" style="cursor:pointer; animation-delay:${delay}s;" onclick="openTeacherProfile('${tId}')">
+                        ${actionsTop}
+                        <div class="c-header" style="border:none; padding:0; margin-top:15px;">
+                            <div class="c-icon icon-purple"><i class="fa-solid fa-chalkboard-user"></i></div>
+                            <div class="c-info">
+                                <h4>${t.name}</h4><p>انقر لإدارة ملفه وطلابه</p>
+                            </div>
+                        </div>
+                        <div style="margin-top:5px; display:flex; gap:10px;">
+                            <div style="flex:1; background:var(--bg-color); padding:12px; border-radius:14px; text-align:center;">
+                                <span style="font-size:12px; font-weight:800; color:var(--text-muted);"><i class="fa-solid fa-users" style="margin-left:3px;"></i> عدد الطلبة</span>
+                                <h3 style="color:var(--text-main); font-size:18px; margin-top:3px; font-weight:900;">${sCount}</h3>
+                            </div>
+                            <div style="flex:1; background:var(--bg-color); padding:12px; border-radius:14px; text-align:center;">
+                                <span style="font-size:12px; font-weight:800; color:var(--text-muted);">المستحقات</span>
+                                <div style="color:var(--primary); font-size:16px; margin-top:3px; font-weight:900;">${formatMoney(t.totalDue)}</div>
+                            </div>
+                        </div>
+                    </div>`; 
+                    delay += 0.05; 
+                } 
+            }
+            document.getElementById('totalTeachersCount').innerText = tCount; 
+            document.getElementById('totalFinancialDue').innerHTML = formatMoney(totalDue); 
+            filterCards('search_teachers', 'teachersContainer');
         }
 
         // ================= الإدارة المباشرة للمدير والقيود (Admin Listeners) =================
@@ -895,24 +935,22 @@
                     if(currentVal) tpSelect.value = currentVal;
                 }
 
-                let tCount = 0; let totalDue = 0; const tContainer = document.getElementById('teachersContainer'); if(tContainer) tContainer.innerHTML = ''; let delay = 0;
-                for(let tId in allTeachers) { 
-                    if(!isTeacherAllowed(tId)) continue; // قيد الأساتذة!
-                    
-                    tCount++; const t = allTeachers[tId]; totalDue += (t.totalDue || 0); 
-                    if(hasPerm('teachers_view') || hasPerm('teachers_manage')) { 
-                        let actionsTop = hasPerm('teachers_manage') ? `<div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="event.stopPropagation(); openEditTeacherModalDirect('${tId}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="event.stopPropagation(); deleteTeacherBtn('${tId}')"><i class="fa-solid fa-trash"></i></button></div>` : '';
-                        tContainer.innerHTML += `<div class="data-card" style="cursor:pointer; animation-delay:${delay}s;" onclick="openTeacherProfile('${tId}')">${actionsTop}<div class="c-header" style="border:none; padding:0; margin-top:15px;"><div class="c-icon icon-purple"><i class="fa-solid fa-chalkboard-user"></i></div><div class="c-info"><h4>${t.name}</h4><p>انقر لإدارة ملفه وطلابه</p></div></div><div style="margin-top:5px; background:var(--bg-color); padding:15px; border-radius:16px; text-align:center;"><span style="font-size:13px; font-weight:700; color:var(--text-muted);">المستحقات الحالية</span><h3 style="color:var(--primary); font-size:22px; margin-top:5px;">${formatMoney(t.totalDue)}</h3></div></div>`; delay += 0.05; 
-                    } 
-                }
+                // استدعاء دالة الرسم الجديدة
+                renderTeachersGrid();
                 
-                document.getElementById('totalTeachersCount').innerText = tCount; document.getElementById('totalFinancialDue').innerHTML = formatMoney(totalDue); 
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') { document.getElementById('tpAdminFilter').style.display = 'block'; renderTeacherPortal(); }
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
-                filterCards('search_teachers', 'teachersContainer');
             });
 
-            db.ref('assignments').on('value', snap => { allAssignments = snap.val() || {}; if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); if(currentViewingTeacherId) refreshTeacherProfileUI(); });
+            db.ref('assignments').on('value', snap => { 
+                allAssignments = snap.val() || {}; 
+                
+                // تحديث واجهة الأساتذة بمجرد إضافة أو إزالة طالب ليتحدث العداد فورياً
+                renderTeachersGrid();
+
+                if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); 
+                if(currentViewingTeacherId) refreshTeacherProfileUI(); 
+            });
 
             db.ref('archives').on('value', snap => {
                 allArchives = snap.val() || {};
@@ -966,7 +1004,6 @@
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal();
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
                 
-                // إعادة الفلاتر إن وجدت
                 filterCards('search_students', 'studentsContainer');
                 filterCards('search_subs', 'subscriptionsContainer');
                 filterCards('search_dist', 'distStudentsContainer');
