@@ -13,13 +13,15 @@
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-database-compat.js"></script>
 
-    <!-- jQuery & DataTables & Excel -->
+    <!-- jQuery & DataTables & Excel & Select2 -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
     <!-- Chart.js & SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -136,6 +138,8 @@
         .btn-edit-corner:hover { background: var(--primary); color: var(--white); }
         .btn-delete-corner { background: rgba(238, 93, 80, 0.1); color: var(--danger); }
         .btn-delete-corner:hover { background: var(--danger); color: var(--white); }
+        .btn-archive-corner { background: rgba(255, 206, 32, 0.1); color: var(--warning); }
+        .btn-archive-corner:hover { background: var(--warning); color: var(--white); }
 
         /* كروت المالية */
         .fin-card { background: linear-gradient(180deg, #FFFFFF 0%, #F9FAFF 100%); overflow: hidden; }
@@ -210,6 +214,29 @@
         .timeline-item:last-child::before { display: none; }
         .timeline-dot { width: 20px; height: 20px; background: var(--white); border: 3px solid var(--success); border-radius: 50%; margin-top: 5px; position: relative; z-index: 2; box-shadow: 0 0 0 4px rgba(5, 205, 153, 0.1); }
         .timeline-content { background: var(--white); padding: 18px 22px; border-radius: 16px; flex: 1; border: 1px solid #F4F7FE; box-shadow: var(--shadow-soft); transition: var(--transition); }
+
+        /* حقل البحث المشترك */
+        .search-wrapper { margin-bottom: 20px; position: relative; width: 100%; max-width: 400px; }
+        .search-wrapper i { position: absolute; right: 15px; top: 15px; color: var(--text-muted); }
+        .search-wrapper input { width:100%; padding: 12px 18px 12px 40px; border: 2px solid #E0E5F2; border-radius: 14px; background: #F4F7FE; font-family: 'Cairo'; outline: none; font-weight: 700; color: var(--text-main); transition: var(--transition); }
+        .search-wrapper input:focus { border-color: var(--primary); background: var(--white); box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1); }
+
+        /* تخصيص Select2 */
+        .select2-container--default .select2-selection--single {
+            background-color: #F4F7FE; border: 2px solid #E0E5F2; border-radius: 14px; height: 50px; display: flex; align-items: center; transition: var(--transition);
+        }
+        .select2-container--default .select2-selection--single:focus, .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: var(--primary); box-shadow: 0 0 0 4px rgba(67, 24, 255, 0.1); background-color: var(--white);
+        }
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: var(--text-main); font-weight: 700; font-family: 'Cairo'; line-height: normal; padding-right: 20px;
+        }
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 48px; top: 0; left: 10px; right: auto;
+        }
+        .select2-dropdown { border: 2px solid #E0E5F2; border-radius: 14px; font-family: 'Cairo'; overflow: hidden; box-shadow: var(--shadow-soft); }
+        .select2-search--dropdown .select2-search__field { font-family: 'Cairo'; border-radius: 8px; border: 1px solid #E0E5F2; outline: none; }
+        .select2-search--dropdown .select2-search__field:focus { border-color: var(--primary); }
 
         /* Toasts التنبيهات */
         #toast-container { position: fixed; bottom: 30px; left: 30px; z-index: 100001 !important; display: flex; flex-direction: column; gap: 15px; }
@@ -290,6 +317,12 @@
                 <label style="font-weight:800; font-size:14px; margin-bottom:10px; display:block;">أنت بصلاحية (موظف إدخال) - اختر الأستاذ لعرض وإدارة طلابه:</label>
                 <select id="tpFilterSelect" onchange="renderTeacherPortal()" style="width:100%; padding:12px; border-radius:12px; border:2px solid #E0E5F2; font-family:'Cairo'; font-weight:700; outline:none;"></select>
             </div>
+            
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search_tp" placeholder="بحث عن طالب ضمن القائمة..." onkeyup="filterCards(this.id, 'teacherStudentsContainer')">
+            </div>
+
             <div class="grid-list" id="teacherStudentsContainer"></div>
         </section>
 
@@ -297,6 +330,10 @@
         <section id="teachersView" class="view-section">
             <div id="teachersGridArea">
                 <div class="section-header"><h2>الكادر التدريسي</h2><button class="btn-primary" id="btnShowAddTeacher" onclick="openModal('addTeacherModal')"><i class="fa-solid fa-plus"></i> إضافة أستاذ</button></div>
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="search_teachers" placeholder="بحث عن أستاذ..." onkeyup="filterCards(this.id, 'teachersContainer')">
+                </div>
                 <div class="grid-list" id="teachersContainer"></div>
             </div>
             <div id="teacherProfileArea" style="display: none;">
@@ -310,16 +347,49 @@
         <!-- 4. إدارة الطلبة -->
         <section id="studentsView" class="view-section">
             <div class="section-header"><h2>السجل العام للطلبة</h2><button class="btn-primary" id="btnShowAddStudent" onclick="openModal('addStudentModal')"><i class="fa-solid fa-user-plus"></i> تسجيل طالب (للإدارة)</button></div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search_students" placeholder="بحث بالاسم، المعرف، الكورس..." onkeyup="filterCards(this.id, 'studentsContainer')">
+            </div>
             <div class="grid-list" id="studentsContainer"></div>
         </section>
+        
+        <!-- 5. الأرشيف (جديد) -->
+        <section id="archiveView" class="view-section">
+            <div class="section-header">
+                <div>
+                    <h2><i class="fa-solid fa-box-archive" style="color:var(--primary);"></i> أرشيف الطلبة</h2>
+                    <p style="color:var(--text-muted); font-weight:700; font-size:14px;">سجل الطلاب الذين أكملوا الكورس أو انسحبوا من المعهد.</p>
+                </div>
+            </div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search_archive" placeholder="بحث في الأرشيف..." onkeyup="filterCards(this.id, 'archiveContainer')">
+            </div>
+            <div class="grid-list" id="archiveContainer"></div>
+        </section>
 
-        <!-- 5. المالية والاشتراكات -->
-        <section id="subscriptionsView" class="view-section"><div class="section-header"><h2>الاشتراكات والتسديدات المالية</h2></div><div class="grid-list" id="subscriptionsContainer"></div></section>
+        <!-- 6. المالية والاشتراكات -->
+        <section id="subscriptionsView" class="view-section">
+            <div class="section-header"><h2>الاشتراكات والتسديدات المالية</h2></div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search_subs" placeholder="بحث عن طالب في المالية..." onkeyup="filterCards(this.id, 'subscriptionsContainer')">
+            </div>
+            <div class="grid-list" id="subscriptionsContainer"></div>
+        </section>
 
-        <!-- 6. التوزيع والجدولة -->
-        <section id="distributionView" class="view-section"><div class="section-header"><h2>مركز التوزيع والجدولة الذكي</h2></div><div class="grid-list" id="distStudentsContainer"></div></section>
+        <!-- 7. التوزيع والجدولة -->
+        <section id="distributionView" class="view-section">
+            <div class="section-header"><h2>مركز التوزيع والجدولة الذكي</h2></div>
+            <div class="search-wrapper">
+                <i class="fa-solid fa-search"></i>
+                <input type="text" id="search_dist" placeholder="بحث عن طالب للتوزيع..." onkeyup="filterCards(this.id, 'distStudentsContainer')">
+            </div>
+            <div class="grid-list" id="distStudentsContainer"></div>
+        </section>
 
-        <!-- 7. السجل الشامل -->
+        <!-- 8. السجل الشامل -->
         <section id="logsView" class="view-section">
             <div class="section-header"><h2>السجل الشامل والتقارير</h2></div>
             <div class="dt-container">
@@ -330,13 +400,13 @@
             </div>
         </section>
 
-        <!-- 8. إدارة المستخدمين -->
+        <!-- 9. إدارة المستخدمين -->
         <section id="usersView" class="view-section">
             <div class="section-header"><h2>إدارة موظفي النظام والصلاحيات</h2><button class="btn-primary" onclick="openAddUserModalWrapper()"><i class="fa-solid fa-user-shield"></i> إنشاء حساب موظف</button></div>
             <div class="grid-list" id="usersContainer"></div>
         </section>
         
-        <!-- 9. أوراق الطباعة والنماذج -->
+        <!-- 10. أوراق الطباعة والنماذج -->
         <section id="printView" class="view-section">
             <div class="section-header">
                 <div>
@@ -350,16 +420,40 @@
                     <select id="print_form_type"><option value="attendance">ورقة سجل الطالب</option></select>
                 </div>
                 <div class="form-group" style="margin-top: 20px;">
-                    <label style="font-size: 15px;">اختر الطالب لإصدار النموذج الخاص به</label>
-                    <select id="print_student_select"></select>
+                    <label style="font-size: 15px; margin-bottom: 12px;">اختر الطالب لإصدار النموذج الخاص به (يدعم البحث)</label>
+                    <select id="print_student_select" style="width: 100%;"></select>
                 </div>
-                <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 15px; font-size: 15px;" onclick="executePrintAttendance()"><i class="fa-solid fa-file-pdf"></i> إنشاء وطباعة الورقة</button>
+                <button class="btn-primary" style="width: 100%; justify-content: center; margin-top: 25px; font-size: 15px;" onclick="executePrintAttendance()"><i class="fa-solid fa-file-pdf"></i> إنشاء وطباعة الورقة</button>
             </div>
         </section>
     </main>
 
     <!-- ================= النوافذ المنبثقة ================= -->
     
+    <!-- نافذة الأرشيف -->
+    <div class="modal-overlay" id="archiveModal">
+        <div class="modal">
+            <h2><i class="fa-solid fa-box-archive" style="color:var(--primary);"></i> ترحيل الطالب للأرشيف</h2>
+            <input type="hidden" id="arc_s_id">
+            <p id="arc_s_name" style="text-align:center; font-weight:800; color:var(--text-main); margin-bottom:15px; background:#F4F7FE; padding:10px; border-radius:10px; border:1px solid #E0E5F2;"></p>
+            <div class="form-group">
+                <label>سبب الترحيل</label>
+                <select id="arc_reason" onchange="document.getElementById('arc_notes_div').style.display = this.value === 'انسحاب' ? 'block' : 'none'">
+                    <option value="اكمل الكورس">أكمل الكورس واستلم الشهادة</option>
+                    <option value="انسحاب">انسحاب من الدورة</option>
+                </select>
+            </div>
+            <div class="form-group" id="arc_notes_div" style="display:none;">
+                <label>ملاحظات / سبب الانسحاب</label>
+                <input type="text" id="arc_notes" placeholder="اكتب السبب هنا...">
+            </div>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModal('archiveModal')">إلغاء</button>
+                <button class="btn-save btn-danger" onclick="confirmArchive()">تأكيد الترحيل</button>
+            </div>
+        </div>
+    </div>
+
     <!-- بوابة إدخال الطلاب / الأساتذة -->
     <div class="modal-overlay" id="teacherAddStudentModal">
         <div class="modal modal-lg">
@@ -448,11 +542,22 @@
             setTimeout(() => { toast.style.animation = 'slideToastOut 0.4s forwards'; setTimeout(() => toast.remove(), 400); }, 4000);
         }
 
+        // فلترة الكروت في الصفحات
+        function filterCards(inputId, containerId) {
+            let filter = document.getElementById(inputId).value.toLowerCase();
+            let container = document.getElementById(containerId);
+            let cards = container.querySelectorAll('.data-card, .teacher-student-card, .fin-card');
+            cards.forEach(card => {
+                let text = card.innerText.toLowerCase();
+                card.style.display = text.includes(filter) ? '' : 'none';
+            });
+        }
+
         const firebaseConfig = { apiKey: "AIzaSyCz8k5wN418xA5r5jgC7kc4K7HhnHa4kqY", authDomain: "cambridge-f71d2.firebaseapp.com", databaseURL: "https://cambridge-f71d2-default-rtdb.europe-west1.firebasedatabase.app", projectId: "cambridge-f71d2", storageBucket: "cambridge-f71d2.firebasestorage.app", messagingSenderId: "827168690909", appId: "1:827168690909:web:67582c1fa79bdf00750134" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        let allTeachers = {}; let allStudents = {}; let allAssignments = {}; let allAdmins = {};
+        let allTeachers = {}; let allStudents = {}; let allAssignments = {}; let allAdmins = {}; let allArchives = {};
         let currentViewingTeacherId = null; let myChart = null; let studentStatusChart = null; let collectionRateChart = null; let dataTable;
         let currentUser = null; 
 
@@ -523,13 +628,10 @@
             if(!currentUser) return false;
             if(currentUser.isSuper || currentUser.role === 'teacher') return true;
             
-            // Check if student belongs to any of the linked teachers
             for(let tId in allAssignments) {
                 if(isTeacherAllowed(tId) && allAssignments[tId][sId]) return true;
             }
-            // Fallback: If the employee added the student themselves but hasn't assigned them yet
             if(allStudents[sId] && allStudents[sId].addedBy === currentUser.id) return true;
-
             return false;
         }
 
@@ -546,21 +648,17 @@
             document.getElementById('currentUserName').innerText = currentUser.name;
             buildSidebar();
             
-            const firstTab = document.getElementById('sidebarMenu').firstElementChild;
-
             if(currentUser.role === 'admin') {
                 document.getElementById('headerTitles').innerHTML = `<h1>لوحة التحكم الإدارية</h1><p>معهد كامبردج - الإدارة العامة والصلاحيات</p>`;
                 applyPermissionsUI(); setupRealtimeListenersAdmin(); 
-                
-                if(hasPerm('teacher_portal') && !currentUser.isSuper && !hasPerm('students_view')) {
-                    switchView('teacherPortalView', firstTab);
-                } else {
-                    switchView('dashboardView', firstTab);
-                }
             } else if (currentUser.role === 'teacher') {
                 document.getElementById('headerTitles').innerHTML = `<h1>بوابة الأساتذة</h1><p>معهد كامبردج - متابعة الطلاب والحضور</p>`;
-                setupRealtimeListenersTeacher(); switchView('teacherPortalView', firstTab);
+                setupRealtimeListenersTeacher();
             }
+
+            // فتح أول نافذة مسموحة تلقائياً
+            const firstTab = document.getElementById('sidebarMenu').firstElementChild;
+            if (firstTab) firstTab.click();
         }
 
         function buildSidebar() {
@@ -568,12 +666,15 @@
             if(currentUser.role === 'teacher') {
                 menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-chalkboard-user"></i> طلابي ومحاضراتي</li>`;
             } else {
-                if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة الإدخال والمحاضرات</li>`;
+                // ترتيب 1: الرئيسية 
                 if(currentUser.isSuper || hasPerm('teachers_view') || hasPerm('students_view') || hasPerm('finance_view') || hasPerm('logs_view')) {
-                    menu.innerHTML += `<li class="nav-item ${!hasPerm('teacher_portal')?'active':''}" onclick="switchView('dashboardView', this)"><i class="fa-solid fa-chart-pie"></i> الرئيسية</li>`;
+                    menu.innerHTML += `<li class="nav-item" onclick="switchView('dashboardView', this)"><i class="fa-solid fa-chart-pie"></i> الرئيسية</li>`;
                 }
+                if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة الإدخال والمحاضرات</li>`;
                 if(hasPerm('teachers_view') || hasPerm('teachers_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teachersView', this)"><i class="fa-solid fa-chalkboard-user"></i> إدارة الأساتذة</li>`;
                 if(hasPerm('students_view') || hasPerm('students_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('studentsView', this)"><i class="fa-solid fa-users"></i> إدارة الطلبة</li>`;
+                // الأرشيف الجديد
+                if(hasPerm('students_view') || hasPerm('students_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('archiveView', this)"><i class="fa-solid fa-box-archive"></i> الأرشيف</li>`;
                 if(hasPerm('finance_view') || hasPerm('finance_pay')) menu.innerHTML += `<li class="nav-item" onclick="switchView('subscriptionsView', this)"><i class="fa-solid fa-wallet"></i> المالية والاشتراكات</li>`;
                 if(hasPerm('assign_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('distributionView', this)"><i class="fa-solid fa-network-wired"></i> التوزيع والجدولة</li>`;
                 if(hasPerm('print_view')) menu.innerHTML += `<li class="nav-item" onclick="switchView('printView', this); populatePrintSelect();"><i class="fa-solid fa-print"></i> أوراق الطباعة</li>`;
@@ -587,14 +688,25 @@
             if(!hasPerm('students_manage')) document.getElementById('btnShowAddStudent').style.display = 'none';
         }
 
-        $(document).ready(function() { dataTable = $('#comprehensiveTable').DataTable({ "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json" }, "pageLength": 10, "ordering": true, "responsive": true, "dom": '<"dt-top"Bf>rt<"dt-bottom"ip>', "buttons": [ { extend: 'excelHtml5', text: '<i class="fa-solid fa-file-excel"></i> تصدير إلى Excel', className: 'dt-button' } ] }); initCharts(); });
+        $(document).ready(function() { 
+            dataTable = $('#comprehensiveTable').DataTable({ "language": { "url": "//cdn.datatables.net/plug-ins/1.13.6/i18n/ar.json" }, "pageLength": 10, "ordering": true, "responsive": true, "dom": '<"dt-top"Bf>rt<"dt-bottom"ip>', "buttons": [ { extend: 'excelHtml5', text: '<i class="fa-solid fa-file-excel"></i> تصدير إلى Excel', className: 'dt-button' } ] }); 
+            initCharts(); 
+        });
+
         function initCharts() {
             myChart = new Chart(document.getElementById('mainChart').getContext('2d'), { type: 'bar', data: { labels: ['إجمالي مبالغ الكورسات', 'المبالغ المحصلة', 'المبالغ المتبقية'], datasets: [{ data: [0, 0, 0], backgroundColor: ['#4318FF', '#05CD99', '#EE5D50'], borderRadius: 8 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display: false } } } });
             studentStatusChart = new Chart(document.getElementById('studentStatusChart').getContext('2d'), { type: 'doughnut', data: { labels: ['مرتبط', 'غير مرتبط'], datasets: [{ data: [0, 1], backgroundColor: ['#4318FF', '#E0E5F2'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } } });
             collectionRateChart = new Chart(document.getElementById('collectionRateChart').getContext('2d'), { type: 'doughnut', data: { labels: ['مستلم', 'متبقي'], datasets: [{ data: [0, 1], backgroundColor: ['#05CD99', '#EE5D50'], borderWidth: 0, cutout: '80%' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: {enabled: false} } } });
         }
 
-        function switchView(viewId, element) { document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); document.getElementById(viewId).classList.add('active'); document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); element.classList.add('active'); if(viewId === 'teachersView') closeTeacherProfile(); }
+        function switchView(viewId, element) { 
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active')); 
+            document.getElementById(viewId).classList.add('active'); 
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active')); 
+            element.classList.add('active'); 
+            if(viewId === 'teachersView') closeTeacherProfile(); 
+        }
+
         function openModal(modalId) { const m = document.getElementById(modalId); m.style.display = 'flex'; setTimeout(() => { m.style.opacity = '1'; m.querySelector('.modal').classList.add('show'); }, 10); }
         function closeModal(modalId) { const m = document.getElementById(modalId); m.style.opacity = '0'; m.querySelector('.modal').classList.remove('show'); setTimeout(() => { m.style.display = 'none'; m.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"])').forEach(i=>i.value=''); m.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false); }, 400); }
 
@@ -727,7 +839,7 @@
             await db.ref(`teachers/${tId}/totalDue`).transaction(curr => { let n = (curr || 0) + (change * rate); return n < 0 ? 0 : n; });
         }
 
-        // ================= الإدارة המباشرة (الأستاذ) =================
+        // ================= الإدارة المباشرة (الأستاذ) =================
         function setupRealtimeListenersTeacher() {
             const tId = currentUser.id;
             db.ref('students').on('value', snap => { allStudents = snap.val() || {}; renderTeacherPortal(); });
@@ -760,6 +872,8 @@
                         </div>
                     </div>`; delay += 0.05;
             }
+            // إعادة تطبيق البحث إن وجد
+            filterCards('search_tp', 'teacherStudentsContainer');
         }
 
         // ================= الإدارة المباشرة للمدير والقيود (Admin Listeners) =================
@@ -795,12 +909,18 @@
                 document.getElementById('totalTeachersCount').innerText = tCount; document.getElementById('totalFinancialDue').innerHTML = formatMoney(totalDue); 
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') { document.getElementById('tpAdminFilter').style.display = 'block'; renderTeacherPortal(); }
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
+                filterCards('search_teachers', 'teachersContainer');
             });
 
             db.ref('assignments').on('value', snap => { allAssignments = snap.val() || {}; if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); if(currentViewingTeacherId) refreshTeacherProfileUI(); });
 
+            db.ref('archives').on('value', snap => {
+                allArchives = snap.val() || {};
+                renderArchives();
+            });
+
             db.ref('students').on('value', snap => {
-                allStudents = snap.val() || {}; document.getElementById('totalStudentsCount').innerText = Object.keys(allStudents).length;
+                allStudents = snap.val() || {}; 
                 const sContainer = document.getElementById('studentsContainer'), subContainer = document.getElementById('subscriptionsContainer'), dsContainer = document.getElementById('distStudentsContainer');
                 sContainer.innerHTML = ''; subContainer.innerHTML = ''; dsContainer.innerHTML = ''; let delay = 0; let totalExpected = 0, totalCollected = 0, totalRemaining = 0; let tableData = []; let assignedCount = 0; let allowedStudentsCount = 0;
 
@@ -823,9 +943,17 @@
 
                     tableData.push([sId, s.name, s.courseName || 'غير محدد', assignedTeacherNames.length > 0 ? assignedTeacherNames.join('، ') : 'غير مرتبط', formatMoneyRaw(price), formatMoneyRaw(paid), formatMoneyRaw(rem), s.duration || 'غير محدد', attLecInfo.join('، ') || '0']);
 
-                    if(hasPerm('students_view') || hasPerm('students_manage')) { let actionsTop = hasPerm('students_manage') ? `<div class="card-actions-top"><button class="action-btn-corner btn-edit-corner" onclick="openEditStudentModal('${sId}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="deleteStudentBtn('${sId}')"><i class="fa-solid fa-trash"></i></button></div>` : ''; sContainer.innerHTML += `<div class="data-card" style="animation-delay: ${delay}s">${actionsTop}<div class="c-header" style="margin-top:15px;"><div class="c-icon icon-blue"><i class="fa-solid fa-user-graduate"></i></div><div class="c-info"><h4>${s.name}</h4><p><i class="fa-solid fa-id-badge"></i> ${sId}</p></div></div><div style="background:var(--bg-color); padding:12px; border-radius:12px; font-size:13px; font-weight:700;"><span style="color:var(--text-muted);">الكورس:</span> <span style="color:var(--primary);">${s.courseName||'غير محدد'}</span><br>${needsPricingMsg}</div></div>`; }
+                    if(hasPerm('students_view') || hasPerm('students_manage')) { 
+                        let actionsTop = hasPerm('students_manage') ? `<div class="card-actions-top"><button class="action-btn-corner btn-archive-corner" onclick="openArchiveModal('${sId}')" title="ترحيل للأرشيف"><i class="fa-solid fa-box-archive"></i></button><button class="action-btn-corner btn-edit-corner" onclick="openEditStudentModal('${sId}')"><i class="fa-solid fa-pen"></i></button><button class="action-btn-corner btn-delete-corner" onclick="deleteStudentBtn('${sId}')"><i class="fa-solid fa-trash"></i></button></div>` : ''; 
+                        sContainer.innerHTML += `<div class="data-card" style="animation-delay: ${delay}s">${actionsTop}<div class="c-header" style="margin-top:15px;"><div class="c-icon icon-blue"><i class="fa-solid fa-user-graduate"></i></div><div class="c-info"><h4>${s.name}</h4><p><i class="fa-solid fa-id-badge"></i> ${sId}</p></div></div><div style="background:var(--bg-color); padding:12px; border-radius:12px; font-size:13px; font-weight:700;"><span style="color:var(--text-muted);">الكورس:</span> <span style="color:var(--primary);">${s.courseName||'غير محدد'}</span><br>${needsPricingMsg}</div></div>`; 
+                    }
+                    
                     if(hasPerm('assign_manage')) dsContainer.innerHTML += `<div class="data-card" style="animation-delay: ${delay}s"><div class="c-header"><div class="c-info"><h4>${s.name}</h4><p style="color:var(--primary); font-weight:800;">${s.courseName||'غير محدد'}</p></div></div><div class="c-actions"><button class="btn-primary" style="width:100%; justify-content:center;" onclick="openSmartAssign('${sId}','${s.name}','${s.courseName||''}')"><i class="fa-solid fa-link"></i> ربط وتحديد السعر والأجر</button></div></div>`;
-                    if(hasPerm('finance_view') || hasPerm('finance_pay')) { let btnPay = hasPerm('finance_pay') ? `<button class="btn-primary btn-success" style="flex:1.5; justify-content:center;" onclick="openPaymentModal('${sId}','${s.name}')"><i class="fa-solid fa-money-bill-wave"></i> استلام دفعة</button>` : ''; subContainer.innerHTML += `<div class="data-card fin-card" style="animation-delay: ${delay}s"><div class="c-header" style="border:none; padding-bottom:5px;"><div class="c-info"><h4>${s.name}</h4></div></div><div class="fin-details"><div class="fin-item"><span>الكلفة</span><strong>${formatMoney(price)}</strong></div><div style="width:1px; background:#E0E5F2; height:30px;"></div><div class="fin-item"><span>المدفوع</span><strong style="color:var(--success);">${formatMoney(paid)}</strong></div><div style="width:1px; background:#E0E5F2; height:30px;"></div><div class="fin-item"><span>المتبقي</span><strong style="color:var(--danger);">${formatMoney(rem)}</strong></div></div><div class="progress-box"><div class="progress-labels"><span>النسبة</span><span>${Math.round(percentage)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width: ${percentage}%"></div></div></div><div style="text-align:right;"><span style="font-size: 11px; font-weight: 700; background: rgba(5, 205, 153, 0.1); color: var(--success); padding: 6px 12px; border-radius: 10px; display: inline-block; margin-top: 5px;"><i class="fa-solid fa-clock-rotate-left"></i> أخر دفعة: ${lastPayDate}</span></div><div class="c-actions" style="margin-top:15px; border-top:1px solid #F4F7FE; padding-top:15px;"><button class="btn-primary btn-outline" style="flex:1; justify-content:center;" onclick="viewHistory('${sId}','${s.name}')"><i class="fa-solid fa-list-ul"></i> السجل</button> ${btnPay} </div></div>`; }
+                    
+                    if(hasPerm('finance_view') || hasPerm('finance_pay')) { 
+                        let btnPay = hasPerm('finance_pay') ? `<button class="btn-primary btn-success" style="flex:1.5; justify-content:center;" onclick="openPaymentModal('${sId}','${s.name}')"><i class="fa-solid fa-money-bill-wave"></i> استلام دفعة</button>` : ''; 
+                        subContainer.innerHTML += `<div class="data-card fin-card" style="animation-delay: ${delay}s"><div class="c-header" style="border:none; padding-bottom:5px;"><div class="c-info"><h4>${s.name}</h4></div></div><div class="fin-details"><div class="fin-item"><span>الكلفة</span><strong>${formatMoney(price)}</strong></div><div style="width:1px; background:#E0E5F2; height:30px;"></div><div class="fin-item"><span>المدفوع</span><strong style="color:var(--success);">${formatMoney(paid)}</strong></div><div style="width:1px; background:#E0E5F2; height:30px;"></div><div class="fin-item"><span>المتبقي</span><strong style="color:var(--danger);">${formatMoney(rem)}</strong></div></div><div class="progress-box"><div class="progress-labels"><span>النسبة</span><span>${Math.round(percentage)}%</span></div><div class="progress-bar"><div class="progress-fill" style="width: ${percentage}%"></div></div></div><div style="text-align:right;"><span style="font-size: 11px; font-weight: 700; background: rgba(5, 205, 153, 0.1); color: var(--success); padding: 6px 12px; border-radius: 10px; display: inline-block; margin-top: 5px;"><i class="fa-solid fa-clock-rotate-left"></i> أخر دفعة: ${lastPayDate}</span></div><div class="c-actions" style="margin-top:15px; border-top:1px solid #F4F7FE; padding-top:15px;"><button class="btn-primary btn-outline" style="flex:1; justify-content:center;" onclick="viewHistory('${sId}','${s.name}')"><i class="fa-solid fa-list-ul"></i> السجل</button> ${btnPay} </div></div>`; 
+                    }
                     delay += 0.05;
                 }
                 
@@ -837,7 +965,138 @@
                 if(dataTable) { dataTable.clear(); dataTable.rows.add(tableData); dataTable.draw(); }
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal();
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
+                
+                // إعادة الفلاتر إن وجدت
+                filterCards('search_students', 'studentsContainer');
+                filterCards('search_subs', 'subscriptionsContainer');
+                filterCards('search_dist', 'distStudentsContainer');
+                
+                populatePrintSelect();
             });
+        }
+
+        // ================= الأرشيف (ترحيل الطلاب) =================
+        function openArchiveModal(sId) {
+            if(!hasPerm('students_manage')) return showToast('لا تملك صلاحية', 'error');
+            const s = allStudents[sId]; if(!s) return;
+            document.getElementById('arc_s_id').value = sId;
+            document.getElementById('arc_s_name').innerText = `ترحيل الطالب: ${s.name}`;
+            document.getElementById('arc_reason').value = 'اكمل الكورس';
+            document.getElementById('arc_notes_div').style.display = 'none';
+            document.getElementById('arc_notes').value = '';
+            openModal('archiveModal');
+        }
+
+        async function confirmArchive() {
+            const sId = document.getElementById('arc_s_id').value;
+            const reason = document.getElementById('arc_reason').value;
+            const notes = document.getElementById('arc_notes').value;
+            
+            if(reason === 'انسحاب' && !notes.trim()) {
+                return showToast('يرجى كتابة سبب الانسحاب', 'error');
+            }
+
+            const s = allStudents[sId];
+            if(!s) return;
+
+            let assignedTeachers = [];
+            let totalAttended = 0;
+
+            for(let tId in allAssignments) {
+                if(allAssignments[tId][sId]) {
+                    const t = allTeachers[tId];
+                    if(t) {
+                        assignedTeachers.push({
+                            teacherId: tId,
+                            teacherName: t.name,
+                            attendedLectures: allAssignments[tId][sId].attendedLectures || 0,
+                            lessonRate: allAssignments[tId][sId].lessonRate || 0,
+                            courseName: allAssignments[tId][sId].courseName || ''
+                        });
+                        totalAttended += (allAssignments[tId][sId].attendedLectures || 0);
+                    }
+                }
+            }
+
+            const archiveData = {
+                ...s,
+                archiveDate: new Date().toLocaleDateString('ar-IQ'),
+                archiveReason: reason,
+                archiveNotes: notes,
+                teachersHistory: assignedTeachers,
+                totalAttendedLectures: totalAttended
+            };
+
+            Swal.fire({ 
+                title: 'تأكيد الترحيل', 
+                text: "سيتم نقل الطالب للأرشيف وإزالته من كافة القوائم والأساتذة", 
+                icon: 'warning', 
+                showCancelButton: true, 
+                confirmButtonColor: '#FFCE20', 
+                confirmButtonText: 'نعم، رحّل الطالب', 
+                cancelButtonText: 'إلغاء' 
+            }).then(async (result) => { 
+                if (result.isConfirmed) {
+                    await db.ref('archives/' + sId).set(archiveData);
+                    
+                    for(let tId in allAssignments) {
+                        if(allAssignments[tId][sId]) {
+                            await db.ref(`assignments/${tId}/${sId}`).remove();
+                        }
+                    }
+                    await db.ref('students/' + sId).remove();
+                    
+                    closeModal('archiveModal');
+                    showToast('تم ترحيل الطالب إلى الأرشيف بنجاح');
+                } 
+            });
+        }
+
+        function renderArchives() {
+            const container = document.getElementById('archiveContainer');
+            if(!container) return;
+            container.innerHTML = '';
+            let delay = 0;
+            for(let sId in allArchives) {
+                const s = allArchives[sId];
+                const statusColor = s.archiveReason === 'انسحاب' ? 'var(--danger)' : 'var(--success)';
+                const statusIcon = s.archiveReason === 'انسحاب' ? 'fa-person-walking-arrow-right' : 'fa-graduation-cap';
+                const price = s.coursePrice||0, paid = s.paidAmount||0, rem = price-paid;
+                
+                let teacherStr = s.teachersHistory && s.teachersHistory.length > 0 
+                    ? s.teachersHistory.map(t => `${t.teacherName} (${t.attendedLectures} محاضرة)`).join('<br>') 
+                    : 'لا يوجد';
+
+                container.innerHTML += `
+                <div class="data-card" style="animation-delay: ${delay}s; border-right: 5px solid ${statusColor};">
+                    <div class="c-header" style="margin-top:10px;">
+                        <div class="c-icon" style="background:rgba(0,0,0,0.05); color:${statusColor};">
+                            <i class="fa-solid ${statusIcon}"></i>
+                        </div>
+                        <div class="c-info">
+                            <h4>${s.name}</h4>
+                            <p><i class="fa-solid fa-id-badge"></i> ${sId} | ${s.phone || 'لا يوجد'}</p>
+                        </div>
+                    </div>
+                    <div style="background:var(--bg-color); padding:12px; border-radius:12px; font-size:13px; font-weight:700;">
+                        <span style="color:var(--text-muted);">حالة الترحيل:</span> 
+                        <span style="color:${statusColor};">${s.archiveReason}</span>
+                        ${s.archiveNotes ? `<br><span style="color:var(--danger); font-size:11px;">السبب: ${s.archiveNotes}</span>` : ''}
+                        <hr style="border:0; border-top:1px solid #E0E5F2; margin:8px 0;">
+                        <span style="color:var(--text-muted);">الكورس:</span> <span style="color:var(--primary);">${s.courseName||'غير محدد'}</span><br>
+                        <span style="color:var(--text-muted);">تاريخ الترحيل:</span> <span>${s.archiveDate || 'غير معروف'}</span><br>
+                        <hr style="border:0; border-top:1px solid #E0E5F2; margin:8px 0;">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span>المدفوع: <span style="color:var(--success);">${formatMoneyRaw(paid)}</span></span>
+                            <span>المتبقي: <span style="color:var(--danger);">${formatMoneyRaw(rem)}</span></span>
+                        </div>
+                        <span style="color:var(--text-muted);">الأساتذة والمحاضرات:</span><br>
+                        <span style="font-size:11px;">${teacherStr}</span>
+                    </div>
+                </div>`;
+                delay += 0.05;
+            }
+            filterCards('search_archive', 'archiveContainer');
         }
 
         // ================= الإدارة العامة (לلمدير) =================
@@ -905,14 +1164,22 @@
         async function removeAssignment(tId, sId) { Swal.fire({ title: 'فك ارتباط؟', text: "لن يرى الأستاذ هذا الطالب بعد الآن", icon: 'warning', showCancelButton: true, confirmButtonColor: '#EE5D50', confirmButtonText: 'فك الارتباط', cancelButtonText: 'إلغاء' }).then(async (result) => { if (result.isConfirmed) { await db.ref(`assignments/${tId}/${sId}`).remove(); showToast('تم الإلغاء'); }}); }
         async function deleteTeacherBtn(tIdPassed) { let targetId = tIdPassed || currentViewingTeacherId; Swal.fire({title:'متأكد؟',text:'سيحذف الأستاذ وكافة بياناته وجداوله نهائياً',icon:'error',showCancelButton:true, confirmButtonColor: '#EE5D50', confirmButtonText: 'احذف نهائياً', cancelButtonText: 'تراجع'}).then(async res => { if(res.isConfirmed) { await db.ref('teachers/' + targetId).remove(); await db.ref('users/' + targetId).remove(); await db.ref('assignments/' + targetId).remove(); if(currentViewingTeacherId === targetId) closeTeacherProfile(); showToast('تم الحذف'); }}); }
 
-        // ================= دوال أوراق الطباعة (النسخة المصلحة نهائياً) =================
+        // ================= دوال أوراق الطباعة =================
         function populatePrintSelect() {
-            const sel = document.getElementById('print_student_select'); 
-            sel.innerHTML = '<option value="">-- اختر طالباً --</option>';
+            const sel = $('#print_student_select'); 
+            sel.empty();
+            sel.append('<option value="">-- اختر طالباً --</option>');
             for(let sId in allStudents) { 
                 if(isStudentAllowed(sId)) {
-                    sel.innerHTML += `<option value="${sId}">${allStudents[sId].name}</option>`; 
+                    sel.append(`<option value="${sId}">${allStudents[sId].name}</option>`); 
                 }
+            }
+            if (!sel.hasClass("select2-hidden-accessible")) {
+                sel.select2({
+                    dir: "rtl",
+                    placeholder: "-- اختر طالباً (اكتب للاختيار) --",
+                    width: '100%'
+                });
             }
         }
 
