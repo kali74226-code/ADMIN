@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>معهد كامبردج - نظام الإدارة المتقدم والجدولة الذكية</title>
+    <title>معهد كامبردج - نظام الإدارة المتقدم والجدولة المرنة</title>
     
     <!-- تهيئة الوضع الليلي مبكراً لمنع الوميض الأبيض -->
     <script>
@@ -58,6 +58,7 @@
             --light-bg: #F4F7FE;
             --modal-overlay: rgba(11, 20, 55, 0.55);
             --slot-bg: #F8FAFF;
+            --time-band-bg: #EEF2FF;
         }
 
         [data-theme="dark"] {
@@ -79,6 +80,7 @@
             --light-bg: #0B1437;
             --modal-overlay: rgba(0, 0, 0, 0.72);
             --slot-bg: #162252;
+            --time-band-bg: #1B2559;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Cairo', sans-serif; }
@@ -219,31 +221,262 @@
         .tp-due-box h3 { font-size: 26px; font-weight: 900; }
         .student-assign-item { display: flex; justify-content: space-between; align-items: center; padding: 18px 22px; background: var(--white); border-radius: 16px; margin-bottom: 14px; border-right: 5px solid var(--primary); box-shadow: var(--shadow-soft); transition: var(--transition); border-top: 1px solid var(--border-color); border-left: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); flex-wrap: wrap; gap: 12px; }
 
-        /* ================= تصميم الجداول الأسبوعية للأساتذة (Master Timetable) ================= */
-        .schedule-toolbar { background: var(--white); padding: 22px 26px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px; border: 1px solid var(--border-color); }
-        .schedule-stats-bar { display: flex; gap: 14px; flex-wrap: wrap; }
-        .sch-stat-pill { background: var(--light-bg); border: 1px solid var(--border-color); padding: 8px 16px; border-radius: 12px; font-size: 13px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+        /* ================= التصميم الجديد المبسط والمرن جداً لجداول الأساتذة ================= */
+        .teacher-sch-card {
+            background: var(--white);
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: var(--shadow-soft);
+            border: 2px solid var(--border-color);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        .teacher-sch-card::before {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; width: 6px; height: 100%;
+            background: linear-gradient(180deg, var(--primary), var(--info));
+        }
+        .teacher-sch-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+        }
+        .tsc-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+        .tsc-avatar {
+            width: 54px; height: 54px; border-radius: 16px;
+            background: linear-gradient(135deg, rgba(67,24,255,0.12), rgba(0,181,216,0.12));
+            color: var(--primary); display: flex; align-items: center; justify-content: center;
+            font-size: 24px; font-weight: 900;
+        }
+        .tsc-metrics { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; background: var(--light-bg); padding: 12px; border-radius: 16px; border: 1px solid var(--border-color); text-align: center; }
+        .tsc-metric-box span { display: block; font-size: 11px; color: var(--text-muted); font-weight: 800; margin-bottom: 2px; }
+        .tsc-metric-box strong { font-size: 16px; font-weight: 900; color: var(--text-main); }
+        .tsc-footer { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 800; color: var(--primary); padding-top: 4px; }
+
+        .schedule-toolbar { background: var(--white); padding: 20px 26px; border-radius: 20px; box-shadow: var(--shadow-soft); margin-bottom: 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; border: 1px solid var(--border-color); }
+        .schedule-stats-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        .sch-stat-pill { background: var(--light-bg); border: 1px solid var(--border-color); padding: 8px 15px; border-radius: 12px; font-size: 13px; font-weight: 800; color: var(--text-main); display: flex; align-items: center; gap: 7px; }
         .sch-stat-pill i { color: var(--primary); }
-        .sch-stat-pill.conflict-pill { background: rgba(238, 93, 80, 0.1); border-color: var(--danger); color: var(--danger); }
 
-        .weekly-board { display: grid; grid-template-columns: repeat(auto-fit, minmax(235px, 1fr)); gap: 16px; align-items: start; margin-bottom: 30px; }
-        .day-column { background: var(--white); border-radius: 20px; box-shadow: var(--shadow-soft); border: 1px solid var(--border-color); overflow: hidden; display: flex; flex-direction: column; min-height: 290px; transition: var(--transition); }
-        .day-column:hover { border-color: rgba(67, 24, 255, 0.35); }
-        .day-col-header { background: linear-gradient(135deg, var(--primary), #6342ff); color: #fff; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; font-weight: 900; font-size: 15px; }
-        .day-col-header .day-count-badge { background: rgba(255,255,255,0.22); color: #fff; padding: 2px 10px; border-radius: 20px; font-size: 12px; font-weight: 800; }
-        .day-col-body { padding: 14px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
-        
-        .slot-card { background: var(--slot-bg); border: 1px solid var(--border-color); border-right: 4px solid var(--primary); border-radius: 14px; padding: 13px; position: relative; transition: var(--transition); cursor: pointer; }
-        .slot-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(67, 24, 255, 0.12); border-color: var(--primary); }
-        .slot-card.conflict-slot { border-right-color: var(--danger); background: rgba(238, 93, 80, 0.06); border-color: rgba(238, 93, 80, 0.4); }
-        .slot-time { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 900; color: var(--primary); background: rgba(67, 24, 255, 0.1); padding: 4px 10px; border-radius: 8px; margin-bottom: 8px; }
-        .slot-card.conflict-slot .slot-time { background: rgba(238, 93, 80, 0.15); color: var(--danger); }
-        .slot-student-name { font-size: 14.5px; font-weight: 900; color: var(--text-main); margin-bottom: 4px; display: flex; justify-content: space-between; align-items: center; }
-        .slot-course { font-size: 12px; font-weight: 700; color: var(--text-muted); display: flex; align-items: center; gap: 6px; }
-        .slot-meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px dashed var(--border-color); font-size: 11.5px; font-weight: 800; color: var(--text-muted); }
-        .conflict-warning-tag { font-size: 11px; font-weight: 900; color: var(--danger); display: flex; align-items: center; gap: 4px; margin-top: 6px; }
+        /* شريط فلترة الأيام السريع */
+        .days-filter-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 22px;
+            background: var(--white);
+            padding: 14px 18px;
+            border-radius: 18px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color);
+            align-items: center;
+        }
+        .day-tab-btn {
+            padding: 9px 18px;
+            border-radius: 12px;
+            border: 2px solid var(--border-color);
+            background: var(--light-bg);
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .day-tab-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .day-tab-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #ffffff;
+            box-shadow: 0 8px 16px rgba(67, 24, 255, 0.25);
+        }
+        .day-tab-btn .count-dot {
+            background: rgba(0,0,0,0.08);
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 11.5px;
+        }
+        .day-tab-btn.active .count-dot {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
 
-        .unscheduled-panel { background: var(--white); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-soft); border: 2px dashed var(--warning); margin-top: 15px; }
+        /* بطاقة اليوم الواحد الواضحة والمنظمة */
+        .day-schedule-block {
+            background: var(--white);
+            border-radius: 22px;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-color);
+            margin-bottom: 24px;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+        .day-schedule-header {
+            background: linear-gradient(90deg, var(--primary), #6342ff);
+            color: #ffffff;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .day-schedule-header h3 {
+            font-size: 18px;
+            font-weight: 900;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .day-schedule-body {
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        /* مجموعة الساعة داخل اليوم (Time Group Band) */
+        .hour-group-box {
+            background: var(--light-bg);
+            border: 2px solid var(--border-color);
+            border-right: 6px solid var(--primary);
+            border-radius: 18px;
+            padding: 18px 20px;
+            transition: var(--transition);
+        }
+        .hour-group-box:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px rgba(67, 24, 255, 0.08);
+        }
+        .hour-group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-bottom: 14px;
+            margin-bottom: 14px;
+            border-bottom: 1px dashed var(--border-color);
+        }
+        .hour-badge-large {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--primary);
+            color: #ffffff;
+            padding: 8px 18px;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 900;
+            box-shadow: 0 6px 15px rgba(67, 24, 255, 0.2);
+        }
+        .hour-students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 14px;
+        }
+
+        /* بطاقة الطالب المرنة داخل مجموعة الساعة */
+        .easy-student-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            padding: 15px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: var(--transition);
+            position: relative;
+        }
+        .easy-student-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-hover);
+        }
+        .esc-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 8px;
+        }
+        .esc-name {
+            font-size: 15px;
+            font-weight: 900;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .esc-course {
+            display: inline-block;
+            background: rgba(67, 24, 255, 0.08);
+            color: var(--primary);
+            padding: 3px 10px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+        .esc-days-tags {
+            font-size: 11.5px;
+            font-weight: 700;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .esc-actions {
+            display: flex;
+            gap: 8px;
+            padding-top: 8px;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto;
+        }
+        .esc-btn {
+            flex: 1;
+            padding: 7px 10px;
+            border-radius: 9px;
+            border: none;
+            font-size: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+        .esc-btn-edit {
+            background: rgba(67, 24, 255, 0.1);
+            color: var(--primary);
+        }
+        .esc-btn-edit:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+        .esc-btn-del {
+            background: rgba(238, 93, 80, 0.1);
+            color: var(--danger);
+            flex: 0.4;
+        }
+        .esc-btn-del:hover {
+            background: var(--danger);
+            color: #fff;
+        }
+
+        .unscheduled-panel { background: var(--white); border-radius: 20px; padding: 22px; box-shadow: var(--shadow-soft); border: 2px dashed var(--warning); margin-bottom: 24px; }
         .unscheduled-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 15px; }
         .unscheduled-chip { background: var(--light-bg); border: 1px solid var(--border-color); padding: 10px 16px; border-radius: 14px; display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 800; }
 
@@ -358,7 +591,7 @@
         <header class="header">
             <div id="headerTitles">
                 <h1>لوحة التحكم الإدارية</h1>
-                <p>معهد كامبردج - نظام متكامل للمراقبة، الجداول التفاعلية، الصلاحيات والتقارير</p>
+                <p>معهد كامبردج - نظام متكامل للمراقبة، الجداول المرنة، الصلاحيات والتقارير</p>
             </div>
             <div class="profile-section">
                 <div class="theme-toggle" onclick="toggleTheme()" title="تغيير المظهر"><i id="themeIcon" class="fa-solid fa-moon"></i></div>
@@ -385,38 +618,74 @@
             <div class="chart-container"><div class="section-header" style="margin-bottom:15px;"><h2><i class="fa-solid fa-chart-pie" style="color:var(--primary);"></i> تفصيل المبالغ والاشتراكات</h2></div><canvas id="mainChart" style="max-height: 270px; width: 100%;"></canvas></div>
         </section>
 
-        <!-- 2. مركز جداول الأساتذة الذكي (الجديد كلياً) -->
+        <!-- 2. مركز جداول الأساتذة الذكي والمرن جداً -->
         <section id="schedulesCenterView" class="view-section">
-            <div class="section-header">
-                <div>
-                    <h2><i class="fa-solid fa-calendar-check" style="color:var(--primary);"></i> مركز تنظيم وإدارة جداول الأساتذة</h2>
-                    <p style="color:var(--text-muted); font-weight:700; font-size:13.5px;">استعرض جدول كل أستاذ، تحكم بالمواعيد، وزع الطلبة، واكشف التعارضات الزمنية تلقائياً.</p>
+            
+            <!-- المستوى الأول: بطاقات الأساتذة -->
+            <div id="schedulesTeachersGridStage">
+                <div class="section-header">
+                    <div>
+                        <h2><i class="fa-solid fa-calendar-check" style="color:var(--primary);"></i> جداول الأساتذة والمواعيد (اختر الأستاذ)</h2>
+                        <p style="color:var(--text-muted); font-weight:700; font-size:13.5px;">انقر على أي أستاذ لتصفح جدوله ومواعيد طلابه مرتبة بوضوح تام حسب الأيام والساعات مع إمكانية التعديل الفوري.</p>
+                    </div>
                 </div>
-                <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                    <button class="btn-primary" onclick="openAssignFromScheduleModal()"><i class="fa-solid fa-user-plus"></i> توزيع طالب لجدول الأستاذ</button>
-                    <button class="btn-primary btn-outline" onclick="printTeacherTimetable()"><i class="fa-solid fa-print"></i> طباعة جدول الأستاذ</button>
+                <div class="search-wrapper">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="search_sch_teachers" placeholder="ابحث عن أستاذ لعرض جدوله..." onkeyup="filterScheduleTeacherCards()">
                 </div>
+                <div class="grid-list" id="schedulesTeachersCardsContainer"></div>
             </div>
 
-            <div class="schedule-toolbar">
-                <div style="display:flex; align-items:center; gap:15px; flex:1; min-width:280px;">
-                    <label style="font-weight:900; font-size:14px; white-space:nowrap;"><i class="fa-solid fa-chalkboard-user" style="color:var(--primary);"></i> اختر الأستاذ:</label>
-                    <select id="masterScheduleTeacherSelect" onchange="renderMasterSchedule()" style="width:100%; max-width:360px; padding:12px 16px; border-radius:14px; border:2px solid var(--border-color); background:var(--input-bg); color:var(--text-main); font-weight:800; outline:none;"></select>
+            <!-- المستوى الثاني: الجدول المرن والواضح للأستاذ المختار -->
+            <div id="schedulesDetailMatrixStage" style="display:none;">
+                <div class="section-header">
+                    <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap;">
+                        <button class="btn-cancel" id="btnBackToSchTeachers" style="width:auto; padding:10px 18px; display:inline-flex; align-items:center; gap:8px;" onclick="closeTeacherScheduleDetail()">
+                            <i class="fa-solid fa-arrow-right"></i> رجوع لقائمة الأساتذة
+                        </button>
+                        <div>
+                            <h2 id="activeScheduleTeacherTitle" style="font-size:22px; color:var(--primary);">جدول الأستاذ</h2>
+                            <p style="color:var(--text-muted); font-weight:700; font-size:13px;">مرتب بوضوح حسب الأيام والساعات — يمكنك تعديل موعد أي طالب أو تغيير وقت مجموعة كاملة بضغطة زر.</p>
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                        <button class="btn-primary" onclick="openAssignFromScheduleModal()">
+                            <i class="fa-solid fa-user-plus"></i> إضافة وتوزيع طالب للجدول
+                        </button>
+                        <button class="btn-primary btn-success" onclick="printTeacherTimetable()">
+                            <i class="fa-solid fa-print"></i> طباعة جدول الأستاذ
+                        </button>
+                    </div>
                 </div>
-                <div class="schedule-stats-bar" id="scheduleStatsBar">
-                    <div class="sch-stat-pill"><i class="fa-solid fa-users"></i> إجمالي الطلاب: <span id="schTotalStudents">0</span></div>
-                    <div class="sch-stat-pill"><i class="fa-solid fa-clock"></i> الحصص الأسبوعية: <span id="schTotalSlots">0</span></div>
-                    <div class="sch-stat-pill conflict-pill" id="schConflictBox" style="display:none;"><i class="fa-solid fa-triangle-exclamation"></i> تعارض أوقات: <span id="schConflictCount">0</span></div>
+
+                <!-- شريط التبديل السريع والإحصائيات -->
+                <div class="schedule-toolbar">
+                    <div style="display:flex; align-items:center; gap:12px; flex:1; min-width:260px;">
+                        <label style="font-weight:900; font-size:13.5px; white-space:nowrap;"><i class="fa-solid fa-chalkboard-user" style="color:var(--primary);"></i> الأستاذ الحالي:</label>
+                        <select id="masterScheduleTeacherSelect" onchange="selectTeacherForScheduleMatrix(this.value)" style="width:100%; max-width:320px; padding:10px 14px; border-radius:12px; border:2px solid var(--border-color); background:var(--input-bg); color:var(--text-main); font-weight:800; outline:none;"></select>
+                    </div>
+                    <div class="schedule-stats-bar">
+                        <div class="sch-stat-pill"><i class="fa-solid fa-users"></i> طلاب الأستاذ: <span id="schTotalStudents">0</span></div>
+                        <div class="sch-stat-pill"><i class="fa-solid fa-clock"></i> عدد الساعات النشطة: <span id="schActiveHoursCount">0</span></div>
+                        <div class="sch-stat-pill"><i class="fa-solid fa-calendar-day"></i> مجموع الحصص الأسبوعية: <span id="schTotalSlots">0</span></div>
+                    </div>
                 </div>
-            </div>
 
-            <!-- لوحة الأيام الأسبوعية -->
-            <div id="masterTimetableBoard" class="weekly-board"></div>
+                <!-- شريط أزرار فلترة الأيام (كل الأيام أو يوم محدد) -->
+                <div class="days-filter-tabs" id="scheduleDayFilterTabs">
+                    <!-- يولد برمجياً -->
+                </div>
 
-            <!-- لوحة الطلاب غير المجدولين لدى هذا الأستاذ -->
-            <div id="unscheduledStudentsPanel" class="unscheduled-panel" style="display:none;">
-                <h4 style="font-size:15px; font-weight:900; color:var(--text-main);"><i class="fa-solid fa-circle-exclamation" style="color:var(--warning);"></i> طلاب مرتبطون بهذا الأستاذ ولكن لم يتم تحديد أيام/ساعات محاضراتهم بعد:</h4>
-                <div id="unscheduledStudentsList" class="unscheduled-list"></div>
+                <!-- لوحة الطلاب غير المحددة مواعيدهم (تظهر في الأعلى لتنبيه الإدارة لتحديد وقتهم) -->
+                <div id="unscheduledStudentsPanel" class="unscheduled-panel" style="display:none;">
+                    <h4 style="font-size:15px; font-weight:900; color:var(--text-main);"><i class="fa-solid fa-bell" style="color:var(--warning);"></i> طلاب مرتبطون بالأستاذ بانتظار تحديد أيام وساعة محاضرتهم:</h4>
+                    <div id="unscheduledStudentsList" class="unscheduled-list"></div>
+                </div>
+
+                <!-- الحاوية الرئيسية للأيام ومجموعات الساعات الواضحة -->
+                <div id="easyScheduleDaysContainer">
+                    <!-- يولد برمجياً بشكل بطاقات أيام واضحة وبداخلها مجموعات الساعات والطلاب -->
+                </div>
             </div>
         </section>
 
@@ -457,7 +726,7 @@
                 <div class="tp-header"><div class="tp-info"><h2 id="tp_name">اسم الأستاذ</h2><p style="color: var(--text-muted); font-weight:800; font-size:14px;" id="tp_id"><i class="fa-solid fa-id-card"></i> ID: T101</p><div style="margin-top: 18px; display: flex; gap: 10px; flex-wrap:wrap;" id="teacherProfileBtns"></div></div><div class="tp-due-box"><p>رصيد الأستاذ المستحق</p><h3 id="tp_due">0 د.ع</h3></div></div>
                 <div class="section-header">
                     <h2>الطلاب والجدول الزمني للأستاذ</h2>
-                    <button class="btn-primary btn-small" onclick="jumpToTeacherSchedule(currentViewingTeacherId)"><i class="fa-solid fa-calendar-week"></i> فتح في الجدول التفاعلي</button>
+                    <button class="btn-primary btn-small" onclick="jumpToTeacherSchedule(currentViewingTeacherId)"><i class="fa-solid fa-calendar-week"></i> فتح وتنظيم جدول الأستاذ</button>
                 </div>
                 <div id="tp_students_list"></div>
             </div>
@@ -524,7 +793,7 @@
             </div>
         </section>
 
-        <!-- 10. سجل الحركات والمراقبة الأمني (Audit Logs - الجديد كلياً للإدارة) -->
+        <!-- 10. سجل الحركات والمراقبة الأمني (Audit Logs) -->
         <section id="auditLogsView" class="view-section">
             <div class="section-header">
                 <div>
@@ -602,7 +871,7 @@
 
     <!-- ================= النوافذ المنبثقة ================= -->
 
-    <!-- نافذة تعديل جدول طالب أو توزيع طالب من داخل مركز الجداول -->
+    <!-- نافذة تعديل جدول طالب أو توزيع طالب -->
     <div class="modal-overlay" id="scheduleSlotModal">
         <div class="modal modal-lg">
             <h2 id="schModalTitle"><i class="fa-solid fa-calendar-plus" style="color:var(--primary);"></i> تنظيم موعد المحاضرة والربط</h2>
@@ -631,7 +900,7 @@
             </div>
 
             <hr style="border:0; border-top:2px dashed var(--border-color); margin:15px 0;">
-            <h4 style="font-size:14.5px; font-weight:900; color:var(--text-main); margin-bottom:10px;"><i class="fa-solid fa-calendar-week" style="color:var(--primary);"></i> أيام حضور الطالب الأسبوعية</h4>
+            <h4 style="font-size:14.5px; font-weight:900; color:var(--text-main); margin-bottom:10px;"><i class="fa-solid fa-calendar-week" style="color:var(--primary);"></i> اختر أيام حضور الطالب الأسبوعية</h4>
             <div class="form-group">
                 <div class="days-grid" id="sch_modal_days_grid">
                     <label class="day-chip"><input type="checkbox" value="السبت" class="sch-day-cb"><span>السبت</span></label>
@@ -646,7 +915,7 @@
 
             <div class="form-row">
                 <div class="form-group">
-                    <label><i class="fa-regular fa-clock"></i> وقت المحاضرة</label>
+                    <label><i class="fa-regular fa-clock"></i> وقت المحاضرة (الساعة)</label>
                     <input type="time" id="sch_modal_time">
                 </div>
                 <div class="form-group">
@@ -658,7 +927,7 @@
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModal('scheduleSlotModal')">إلغاء</button>
                 <button class="btn-primary btn-danger" id="btnRemoveSlotAssign" style="display:none; flex:1; justify-content:center;" onclick="removeAssignmentFromScheduleModal()"><i class="fa-solid fa-unlink"></i> فك ارتباط الطالب</button>
-                <button class="btn-save" onclick="saveScheduleSlotModal()"><i class="fa-solid fa-check"></i> حفظ واعتماد الجدول</button>
+                <button class="btn-save" onclick="saveScheduleSlotModal()"><i class="fa-solid fa-check"></i> حفظ واعتماد الموعد</button>
             </div>
         </div>
     </div>
@@ -836,7 +1105,10 @@
         const db = firebase.database();
 
         let allTeachers = {}; let allStudents = {}; let allAssignments = {}; let allAdmins = {}; let allArchives = {}; let allAuditLogs = {};
-        let currentViewingTeacherId = null; let myChart = null; let studentStatusChart = null; let collectionRateChart = null;
+        let currentViewingTeacherId = null;
+        let selectedScheduleTeacherId = null;
+        let currentScheduleDayFilter = 'ALL'; // 'ALL' أو اسم اليوم
+        let myChart = null; let studentStatusChart = null; let collectionRateChart = null;
         let dataTable = null; let auditDataTable = null;
         let currentUser = null; 
 
@@ -853,7 +1125,7 @@
                     actorId: currentUser.id,
                     actorName: currentUser.name,
                     actorRole: roleLabel,
-                    category: category, // 'إضافة' | 'تعديل' | 'حذف / أرشفة' | 'مالية' | 'حضور محاضرات' | 'دخول / خروج'
+                    category: category,
                     action: actionTitle,
                     details: detailsText
                 });
@@ -863,6 +1135,15 @@
         }
 
         // ================= دوال مساعدة لتحليل وتنسيق الأوقات والجداول =================
+        function normalizeTime24(tStr) {
+            if(!tStr) return '';
+            let parts = tStr.trim().split(':');
+            if(parts.length < 2) return tStr;
+            let h = String(parseInt(parts[0], 10)).padStart(2, '0');
+            let m = String(parseInt(parts[1], 10)).padStart(2, '0');
+            return `${h}:${m}`;
+        }
+
         function parseScheduleData(assignObj) {
             let days = [];
             let time = '';
@@ -872,7 +1153,7 @@
                 days = assignObj.days;
             }
             if(assignObj.time) {
-                time = assignObj.time;
+                time = normalizeTime24(assignObj.time);
             }
 
             if((days.length === 0 || !time) && assignObj.schedule) {
@@ -880,7 +1161,7 @@
                     if(assignObj.schedule.includes(d) && !days.includes(d)) days.push(d);
                 });
                 let timeMatch = assignObj.schedule.match(/(\d{1,2}:\d{2})/);
-                if(timeMatch && !time) time = timeMatch[1];
+                if(timeMatch && !time) time = normalizeTime24(timeMatch[1]);
             }
             return { days, time };
         }
@@ -941,6 +1222,7 @@
                 if (result.isConfirmed) {
                     await recordAuditLog('تسجيل خروج', 'دخول / خروج', `قام (${currentUser.name}) بتسجيل الخروج من النظام`);
                     currentUser = null;
+                    selectedScheduleTeacherId = null;
                     localStorage.removeItem('cambridgeSession');
                     document.getElementById('loginUser').value = ''; document.getElementById('loginPass').value = '';
                     document.getElementById('loginOverlay').style.display = 'flex';
@@ -1004,7 +1286,7 @@
             buildSidebar();
             
             if(currentUser.role === 'admin') {
-                document.getElementById('headerTitles').innerHTML = `<h1>لوحة التحكم الإدارية</h1><p>معهد كامبردج - الإدارة العامة، الجداول التفاعلية، وسجل المراقبة</p>`;
+                document.getElementById('headerTitles').innerHTML = `<h1>لوحة التحكم الإدارية</h1><p>معهد كامبردج - الإدارة العامة، الجداول المرنة، وسجل المراقبة</p>`;
                 applyPermissionsUI();
                 setupRealtimeListenersAdmin(); 
             } else if (currentUser.role === 'teacher') {
@@ -1020,13 +1302,13 @@
             const menu = document.getElementById('sidebarMenu'); menu.innerHTML = '';
             if(currentUser.role === 'teacher') {
                 menu.innerHTML += `<li class="nav-item active" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-chalkboard-user"></i> طلابي ومحاضراتي</li>`;
-                menu.innerHTML += `<li class="nav-item" onclick="switchView('schedulesCenterView', this); renderMasterSchedule();"><i class="fa-solid fa-calendar-week"></i> جدولي الأسبوعي</li>`;
+                menu.innerHTML += `<li class="nav-item" onclick="switchView('schedulesCenterView', this); openScheduleViewHome();"><i class="fa-solid fa-calendar-week"></i> جدولي ومواعيدي</li>`;
             } else {
                 if(currentUser.isSuper || hasPerm('teachers_view') || hasPerm('students_view') || hasPerm('finance_view') || hasPerm('logs_view')) {
                     menu.innerHTML += `<li class="nav-item" onclick="switchView('dashboardView', this)"><i class="fa-solid fa-chart-pie"></i> الرئيسية</li>`;
                 }
                 if(hasPerm('schedules_manage') || hasPerm('assign_manage')) {
-                    menu.innerHTML += `<li class="nav-item" onclick="switchView('schedulesCenterView', this); renderMasterSchedule();"><i class="fa-solid fa-calendar-check"></i> جداول الأساتذة التفاعلية</li>`;
+                    menu.innerHTML += `<li class="nav-item" onclick="switchView('schedulesCenterView', this); openScheduleViewHome();"><i class="fa-solid fa-calendar-check"></i> جداول الأساتذة والمواعيد</li>`;
                 }
                 if(hasPerm('teacher_portal')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teacherPortalView', this)"><i class="fa-solid fa-laptop-file"></i> بوابة الإدخال والمحاضرات</li>`;
                 if(hasPerm('teachers_view') || hasPerm('teachers_manage')) menu.innerHTML += `<li class="nav-item" onclick="switchView('teachersView', this)"><i class="fa-solid fa-chalkboard-user"></i> إدارة الأساتذة</li>`;
@@ -1089,11 +1371,113 @@
         function openModal(modalId) { const m = document.getElementById(modalId); m.style.display = 'flex'; setTimeout(() => { m.style.opacity = '1'; m.querySelector('.modal').classList.add('show'); }, 10); }
         function closeModal(modalId) { const m = document.getElementById(modalId); m.style.opacity = '0'; m.querySelector('.modal').classList.remove('show'); setTimeout(() => { m.style.display = 'none'; m.querySelectorAll('input:not([type="checkbox"]):not([type="hidden"])').forEach(i=>i.value=''); m.querySelectorAll('input[type="checkbox"]').forEach(i=>i.checked=false); }, 350); }
 
-        // ================= مركز جداول الأساتذة الذكي (Master Timetable Center) =================
+        // ================= مركز جداول الأساتذة المبسط والمرن جداً =================
+
+        function openScheduleViewHome() {
+            if(currentUser && currentUser.role === 'teacher') {
+                document.getElementById('btnBackToSchTeachers').style.display = 'none';
+                selectTeacherForScheduleMatrix(currentUser.id);
+            } else {
+                document.getElementById('btnBackToSchTeachers').style.display = 'inline-flex';
+                if(selectedScheduleTeacherId && allTeachers[selectedScheduleTeacherId]) {
+                    selectTeacherForScheduleMatrix(selectedScheduleTeacherId);
+                } else {
+                    closeTeacherScheduleDetail();
+                }
+            }
+        }
+
+        function closeTeacherScheduleDetail() {
+            selectedScheduleTeacherId = null;
+            document.getElementById('schedulesDetailMatrixStage').style.display = 'none';
+            document.getElementById('schedulesTeachersGridStage').style.display = 'block';
+            renderScheduleTeachersCards();
+        }
+
+        function renderScheduleTeachersCards() {
+            const container = document.getElementById('schedulesTeachersCardsContainer');
+            if(!container) return;
+            container.innerHTML = '';
+
+            let hasAnyTeacher = false;
+            for(let tId in allTeachers) {
+                if(!isTeacherAllowed(tId)) continue;
+                hasAnyTeacher = true;
+
+                const t = allTeachers[tId];
+                const tAssign = allAssignments[tId] || {};
+                let studentsCount = Object.keys(tAssign).length;
+                let weeklySessionsCount = 0;
+                let uniqueHoursSet = new Set();
+                let unscheduledCount = 0;
+
+                for(let sId in tAssign) {
+                    const parsed = parseScheduleData(tAssign[sId]);
+                    if(parsed.days.length === 0 || !parsed.time) {
+                        unscheduledCount++;
+                    } else {
+                        weeklySessionsCount += parsed.days.length;
+                        uniqueHoursSet.add(parsed.time);
+                    }
+                }
+
+                let statusBadge = unscheduledCount > 0
+                    ? `<span style="background:rgba(255,206,32,0.18); color:#b88a00; padding:4px 10px; border-radius:8px; font-size:11px; font-weight:800;"><i class="fa-solid fa-clock"></i> ${unscheduledCount} بدون موعد</span>`
+                    : `<span style="background:rgba(5,205,153,0.12); color:var(--success); padding:4px 10px; border-radius:8px; font-size:11px; font-weight:800;"><i class="fa-solid fa-check-circle"></i> مواعيد منظمة</span>`;
+
+                container.innerHTML += `
+                    <div class="teacher-sch-card" onclick="selectTeacherForScheduleMatrix('${tId}')">
+                        <div class="tsc-top">
+                            <div style="display:flex; align-items:center; gap:14px;">
+                                <div class="tsc-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                                <div>
+                                    <h3 style="font-size:18px; font-weight:900; color:var(--text-main);">${t.name}</h3>
+                                    <span style="font-size:12px; font-weight:700; color:var(--text-muted);">المعرف: ${tId}</span>
+                                </div>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        <div class="tsc-metrics">
+                            <div class="tsc-metric-box">
+                                <span>الطلاب</span>
+                                <strong>${studentsCount}</strong>
+                            </div>
+                            <div class="tsc-metric-box">
+                                <span>الحصص الأسبوعية</span>
+                                <strong style="color:var(--primary);">${weeklySessionsCount}</strong>
+                            </div>
+                            <div class="tsc-metric-box">
+                                <span>أوقات المحاضرات</span>
+                                <strong style="color:var(--success);">${uniqueHoursSet.size}</strong>
+                            </div>
+                        </div>
+                        <div class="tsc-footer">
+                            <span><i class="fa-regular fa-calendar-check"></i> استعراض وتعديل جدول الأستاذ</span>
+                            <i class="fa-solid fa-arrow-left"></i>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if(!hasAnyTeacher) {
+                container.innerHTML = `<div style="grid-column:1/-1; background:var(--white); padding:40px; border-radius:20px; text-align:center; color:var(--text-muted); font-weight:800;">لا يوجد أساتذة متاحون للعرض حالياً.</div>`;
+            }
+            filterScheduleTeacherCards();
+        }
+
+        function filterScheduleTeacherCards() {
+            let input = document.getElementById('search_sch_teachers');
+            if(!input) return;
+            let q = input.value.toLowerCase();
+            let cards = document.querySelectorAll('#schedulesTeachersCardsContainer .teacher-sch-card');
+            cards.forEach(c => {
+                c.style.display = c.innerText.toLowerCase().includes(q) ? '' : 'none';
+            });
+        }
+
         function populateScheduleTeacherDropdown() {
             const sel = document.getElementById('masterScheduleTeacherSelect');
             if(!sel) return;
-            const prevVal = sel.value;
             sel.innerHTML = '';
 
             if(currentUser && currentUser.role === 'teacher') {
@@ -1103,19 +1487,27 @@
             }
 
             sel.disabled = false;
-            sel.innerHTML = '<option value="">-- اختر الأستاذ لعرض وتنظيم جدوله الأسبوعي --</option>';
-            let firstAllowed = '';
             for(let tId in allTeachers) {
                 if(isTeacherAllowed(tId)) {
-                    if(!firstAllowed) firstAllowed = tId;
-                    sel.innerHTML += `<option value="${tId}">${allTeachers[tId].name} (${tId})</option>`;
+                    sel.innerHTML += `<option value="${tId}" ${tId === selectedScheduleTeacherId ? 'selected' : ''}>${allTeachers[tId].name} (${tId})</option>`;
                 }
             }
-            if(prevVal && allTeachers[prevVal] && isTeacherAllowed(prevVal)) {
-                sel.value = prevVal;
-            } else if(firstAllowed) {
-                sel.value = firstAllowed;
-            }
+        }
+
+        function selectTeacherForScheduleMatrix(tId) {
+            if(!tId) return;
+            selectedScheduleTeacherId = tId;
+            currentScheduleDayFilter = 'ALL';
+            document.getElementById('schedulesTeachersGridStage').style.display = 'none';
+            document.getElementById('schedulesDetailMatrixStage').style.display = 'block';
+            populateScheduleTeacherDropdown();
+            document.getElementById('masterScheduleTeacherSelect').value = tId;
+            renderMasterSchedule();
+        }
+
+        function setScheduleDayFilter(dayFilter) {
+            currentScheduleDayFilter = dayFilter;
+            renderMasterSchedule();
         }
 
         function jumpToTeacherSchedule(tId) {
@@ -1125,36 +1517,36 @@
                 if(item.getAttribute('onclick') && item.getAttribute('onclick').includes('schedulesCenterView')) targetNav = item;
             });
             switchView('schedulesCenterView', targetNav);
-            populateScheduleTeacherDropdown();
-            const sel = document.getElementById('masterScheduleTeacherSelect');
-            if(sel) {
-                sel.value = tId;
-                renderMasterSchedule();
-            }
+            selectTeacherForScheduleMatrix(tId);
         }
 
+        // الدالة الرئيسية لعرض الجدول المبسط والواضح جداً (الأيام -> مجموعات الساعات -> بطاقات الطلاب)
         function renderMasterSchedule() {
-            const board = document.getElementById('masterTimetableBoard');
+            renderScheduleTeachersCards();
+
+            const daysContainer = document.getElementById('easyScheduleDaysContainer');
+            const filterTabsContainer = document.getElementById('scheduleDayFilterTabs');
             const unscheduledPanel = document.getElementById('unscheduledStudentsPanel');
             const unscheduledList = document.getElementById('unscheduledStudentsList');
-            if(!board) return;
+            if(!daysContainer) return;
 
-            let sel = document.getElementById('masterScheduleTeacherSelect');
-            if(!sel.value) populateScheduleTeacherDropdown();
-            let tId = (currentUser && currentUser.role === 'teacher') ? currentUser.id : sel.value;
+            let tId = (currentUser && currentUser.role === 'teacher') ? currentUser.id : selectedScheduleTeacherId;
+            if(!tId || (!allTeachers[tId] && currentUser.role !== 'teacher')) return;
 
-            if(!tId || (!allTeachers[tId] && currentUser.role !== 'teacher')) {
-                board.innerHTML = `<div style="grid-column: 1/-1; background:var(--white); padding:45px; border-radius:20px; text-align:center; color:var(--text-muted); font-weight:800; border:1px solid var(--border-color);"><i class="fa-solid fa-calendar-xmark" style="font-size:40px; color:var(--primary); margin-bottom:12px; display:block;"></i>يرجى اختيار أستاذ من القائمة أعلاه لعرض وإدارة جدوله الأسبوعي.</div>`;
-                unscheduledPanel.style.display = 'none';
-                document.getElementById('schTotalStudents').innerText = '0';
-                document.getElementById('schTotalSlots').innerText = '0';
-                document.getElementById('schConflictBox').style.display = 'none';
-                return;
-            }
+            const tName = allTeachers[tId] ? allTeachers[tId].name : currentUser.name;
+            document.getElementById('activeScheduleTeacherTitle').innerHTML = `<i class="fa-solid fa-chalkboard-user"></i> جدول ومواعيد الأستاذ: ${tName}`;
 
             const tAssign = allAssignments[tId] || {};
-            let dayBuckets = {};
-            WEEK_DAYS.forEach(d => dayBuckets[d] = []);
+            
+            // تجميع البيانات حسب اليوم ثم حسب الساعة: dayMap[dayName][time24] = [array of students]
+            let dayMap = {};
+            let dayCounts = {};
+            WEEK_DAYS.forEach(d => {
+                dayMap[d] = {};
+                dayCounts[d] = 0;
+            });
+
+            let activeHoursSet = new Set();
             let unscheduledArr = [];
             let totalStudents = 0;
             let totalWeeklySlots = 0;
@@ -1163,22 +1555,32 @@
                 totalStudents++;
                 const assignData = tAssign[sId];
                 const studentObj = allStudents[sId];
-                const sName = studentObj ? studentObj.name : 'طالب غير موجود';
+                const sName = studentObj ? studentObj.name : 'طالب محذوف';
                 const sPhone = studentObj?.phone || '';
                 const parsed = parseScheduleData(assignData);
 
-                if(parsed.days.length === 0) {
-                    unscheduledArr.push({ sId, sName, courseName: assignData.courseName || studentObj?.courseName || 'غير محدد' });
+                if(parsed.days.length === 0 || !parsed.time) {
+                    unscheduledArr.push({
+                        sId,
+                        sName,
+                        courseName: assignData.courseName || studentObj?.courseName || 'غير محدد'
+                    });
                 } else {
+                    const t24 = parsed.time;
+                    activeHoursSet.add(t24);
+
                     parsed.days.forEach(dayName => {
-                        if(dayBuckets[dayName]) {
+                        if(dayMap[dayName]) {
+                            if(!dayMap[dayName][t24]) dayMap[dayName][t24] = [];
+                            dayCounts[dayName]++;
                             totalWeeklySlots++;
-                            dayBuckets[dayName].push({
+                            dayMap[dayName][t24].push({
                                 sId,
                                 sName,
                                 sPhone,
+                                allDays: parsed.days,
                                 courseName: assignData.courseName || studentObj?.courseName || 'غير محدد',
-                                time24: parsed.time || '',
+                                time24: t24,
                                 lessonRate: assignData.lessonRate || 0,
                                 attendedLectures: assignData.attendedLectures || 0
                             });
@@ -1187,72 +1589,133 @@
                 }
             }
 
-            // ترتيب المحاضرات داخل كل يوم زمنياً + كشف التعارضات
-            let conflictCount = 0;
-            board.innerHTML = '';
-
+            // بناء شريط أزرار فلترة الأيام
+            let tabsHTML = `<span style="font-size:13px; font-weight:900; color:var(--text-muted); margin-left:6px;"><i class="fa-solid fa-filter"></i> عرض الأيام:</span>`;
+            tabsHTML += `<button class="day-tab-btn ${currentScheduleDayFilter === 'ALL' ? 'active' : ''}" onclick="setScheduleDayFilter('ALL')">كل الأسبوع <span class="count-dot">${totalWeeklySlots}</span></button>`;
             WEEK_DAYS.forEach(dayName => {
-                let slots = dayBuckets[dayName];
-                slots.sort((a, b) => (a.time24 || '99:99').localeCompare(b.time24 || '99:99'));
+                tabsHTML += `<button class="day-tab-btn ${currentScheduleDayFilter === dayName ? 'active' : ''}" onclick="setScheduleDayFilter('${dayName}')">${dayName} <span class="count-dot">${dayCounts[dayName]}</span></button>`;
+            });
+            filterTabsContainer.innerHTML = tabsHTML;
 
-                // فحص تكرار نفس الوقت في نفس اليوم لنفس الأستاذ
-                let timeFreq = {};
-                slots.forEach(sl => {
-                    if(sl.time24) timeFreq[sl.time24] = (timeFreq[sl.time24] || 0) + 1;
-                });
+            // بناء بطاقات الأيام ومجموعات الساعات الواضحة
+            daysContainer.innerHTML = '';
+            let daysToRender = currentScheduleDayFilter === 'ALL' ? WEEK_DAYS : [currentScheduleDayFilter];
+            let renderedAnyDayBlock = false;
 
-                let slotsHTML = '';
-                if(slots.length === 0) {
-                    slotsHTML = `<div style="text-align:center; padding:35px 10px; color:var(--text-muted); font-size:12.5px; font-weight:700;"><i class="fa-regular fa-calendar" style="font-size:22px; opacity:0.4; display:block; margin-bottom:8px;"></i>لا توجد محاضرات مجدولة</div>`;
-                } else {
-                    slots.forEach(sl => {
-                        let isConflict = sl.time24 && timeFreq[sl.time24] > 1;
-                        if(isConflict) conflictCount++;
-                        let conflictBanner = isConflict ? `<div class="conflict-warning-tag"><i class="fa-solid fa-triangle-exclamation"></i> تعارض في نفس الوقت!</div>` : '';
+            daysToRender.forEach(dayName => {
+                let hoursObj = dayMap[dayName];
+                let sortedHours = Object.keys(hoursObj).sort((a, b) => a.localeCompare(b));
 
-                        slotsHTML += `
-                            <div class="slot-card ${isConflict ? 'conflict-slot' : ''}" onclick="openEditSlotModal('${tId}', '${sl.sId}')" title="انقر لتعديل موعد الطالب أو نقله">
-                                <div style="display:flex; justify-content:space-between; align-items:center;">
-                                    <span class="slot-time"><i class="fa-regular fa-clock"></i> ${formatTimeArabic12(sl.time24)}</span>
-                                    <i class="fa-solid fa-pen-to-square" style="color:var(--text-muted); font-size:12px;"></i>
+                // إذا كنا في وضع "كل الأسبوع" وكان اليوم فارغاً، نعرضه بشكل مختصر وأنيق مع زر إضافة
+                if(sortedHours.length === 0) {
+                    if(currentScheduleDayFilter !== 'ALL') {
+                        renderedAnyDayBlock = true;
+                        daysContainer.innerHTML += `
+                            <div class="day-schedule-block">
+                                <div class="day-schedule-header">
+                                    <h3><i class="fa-regular fa-calendar"></i> يوم ${dayName}</h3>
+                                    <button class="btn-primary btn-small" style="background:rgba(255,255,255,0.2); box-shadow:none;" onclick="openAssignAtSpecificSlot('${tId}', '${dayName}', '16:00')">
+                                        <i class="fa-solid fa-plus"></i> إضافة محاضرة في يوم ${dayName}
+                                    </button>
                                 </div>
-                                <div class="slot-student-name">
-                                    <span>${sl.sName}</span>
-                                </div>
-                                <div class="slot-course"><i class="fa-solid fa-book-open" style="color:var(--primary); font-size:11px;"></i> ${sl.courseName}</div>
-                                ${conflictBanner}
-                                <div class="slot-meta">
-                                    <span><i class="fa-solid fa-check-double" style="color:var(--success);"></i> حضر: ${sl.attendedLectures}</span>
-                                    <span>${sl.sId}</span>
+                                <div class="day-schedule-body" style="text-align:center; padding:40px 20px; color:var(--text-muted); font-weight:800;">
+                                    لا توجد محاضرات مجدولة في يوم ${dayName} حالياً.
                                 </div>
                             </div>
                         `;
-                    });
+                    }
+                    return;
                 }
 
-                board.innerHTML += `
-                    <div class="day-column">
-                        <div class="day-col-header">
-                            <span>${dayName}</span>
-                            <span class="day-count-badge">${slots.length} حصص</span>
+                renderedAnyDayBlock = true;
+                let hoursGroupsHTML = '';
+
+                sortedHours.forEach(hour24 => {
+                    let studentsInHour = hoursObj[hour24];
+                    let studentsCardsHTML = studentsInHour.map(st => `
+                        <div class="easy-student-card">
+                            <div class="esc-top">
+                                <div class="esc-name">
+                                    <i class="fa-solid fa-user-graduate" style="color:var(--primary);"></i>
+                                    <span>${st.sName}</span>
+                                </div>
+                                <span class="esc-course">${st.courseName}</span>
+                            </div>
+                            <div class="esc-days-tags">
+                                <i class="fa-solid fa-calendar-week" style="color:var(--info);"></i>
+                                <span>أيام الطالب: ${st.allDays.join(' ، ')}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; font-size:12px; font-weight:800; color:var(--text-muted);">
+                                <span><i class="fa-solid fa-check-double" style="color:var(--success);"></i> المحاضرات: ${st.attendedLectures}</span>
+                                <span>${st.sId}</span>
+                            </div>
+                            <div class="esc-actions">
+                                <button class="esc-btn esc-btn-edit" onclick="openEditSlotModal('${tId}', '${st.sId}')">
+                                    <i class="fa-solid fa-clock"></i> تعديل الموعد / الأيام
+                                </button>
+                                ${(canDelete() || currentUser.isSuper) ? `<button class="esc-btn esc-btn-del" onclick="quickRemoveStudentFromTeacher('${tId}', '${st.sId}')" title="إزالة الطالب من جدول الأستاذ"><i class="fa-solid fa-trash-can"></i></button>` : ''}
+                            </div>
                         </div>
-                        <div class="day-col-body">
-                            ${slotsHTML}
+                    `).join('');
+
+                    hoursGroupsHTML += `
+                        <div class="hour-group-box">
+                            <div class="hour-group-header">
+                                <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+                                    <div class="hour-badge-large">
+                                        <i class="fa-regular fa-clock"></i>
+                                        <span>الساعة ${formatTimeArabic12(hour24)}</span>
+                                    </div>
+                                    <span style="font-size:13px; font-weight:800; color:var(--text-muted);">
+                                        (عدد الطلاب في هذه الساعة: <strong style="color:var(--primary);">${studentsInHour.length}</strong>)
+                                    </span>
+                                </div>
+                                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                                    <button class="btn-primary btn-outline btn-small" onclick="promptShiftGroupTime('${tId}', '${dayName}', '${hour24}')" title="تغيير وقت جميع طلاب هذه الساعة معاً">
+                                        <i class="fa-solid fa-arrows-Left-right"></i> تغيير وقت هذه المجموعة
+                                    </button>
+                                    <button class="btn-primary btn-small" onclick="openAssignAtSpecificSlot('${tId}', '${dayName}', '${hour24}')">
+                                        <i class="fa-solid fa-user-plus"></i> إضافة طالب لهذه الساعة
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="hour-students-grid">
+                                ${studentsCardsHTML}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                daysContainer.innerHTML += `
+                    <div class="day-schedule-block">
+                        <div class="day-schedule-header">
+                            <h3><i class="fa-solid fa-calendar-day"></i> يوم ${dayName} <span style="font-size:13px; font-weight:700; background:rgba(255,255,255,0.2); padding:3px 12px; border-radius:20px;">${dayCounts[dayName]} محاضرات</span></h3>
+                            <button class="btn-primary btn-small" style="background:rgba(255,255,255,0.22); box-shadow:none;" onclick="openAssignAtSpecificSlot('${tId}', '${dayName}', '')">
+                                <i class="fa-solid fa-plus"></i> إضافة موعد جديد في يوم ${dayName}
+                            </button>
+                        </div>
+                        <div class="day-schedule-body">
+                            ${hoursGroupsHTML}
                         </div>
                     </div>
                 `;
             });
 
-            // تحديث الإحصائيات العلوية للجدول
-            document.getElementById('schTotalStudents').innerText = totalStudents;
-            document.getElementById('schTotalSlots').innerText = totalWeeklySlots;
-            const conflictBox = document.getElementById('schConflictBox');
-            if(conflictCount > 0) {
-                conflictBox.style.display = 'flex';
-                document.getElementById('schConflictCount').innerText = conflictCount;
-            } else {
-                conflictBox.style.display = 'none';
+            if(!renderedAnyDayBlock) {
+                daysContainer.innerHTML = `
+                    <div style="background:var(--white); padding:50px 25px; border-radius:22px; text-align:center; border:1px solid var(--border-color); box-shadow:var(--shadow-soft);">
+                        <i class="fa-regular fa-calendar-plus" style="font-size:48px; color:var(--primary); display:block; margin-bottom:14px;"></i>
+                        <h3 style="font-size:18px; font-weight:900; color:var(--text-main); margin-bottom:8px;">لا توجد مواعيد محاضرات مجدولة لهذا الأستاذ حتى الآن</h3>
+                        <p style="font-size:13.5px; color:var(--text-muted); font-weight:700; margin-bottom:20px;">يمكنك البدء بإضافة طلاب وتحديد أيام وساعات محاضراتهم بكل سهولة.</p>
+                        <button class="btn-primary" onclick="openAssignFromScheduleModal()"><i class="fa-solid fa-user-plus"></i> إضافة وتوزيع طالب الآن</button>
+                    </div>
+                `;
             }
+
+            // تحديث الإحصائيات العلوية
+            document.getElementById('schTotalStudents').innerText = totalStudents;
+            document.getElementById('schActiveHoursCount').innerText = activeHoursSet.size;
+            document.getElementById('schTotalSlots').innerText = totalWeeklySlots;
 
             // عرض الطلاب غير المجدولين إن وجدوا
             if(unscheduledArr.length > 0) {
@@ -1263,12 +1726,89 @@
                             <strong style="color:var(--text-main);">${u.sName}</strong>
                             <span style="display:block; font-size:11px; color:var(--text-muted);">الكورس: ${u.courseName}</span>
                         </div>
-                        <button class="btn-primary btn-small" onclick="openEditSlotModal('${tId}', '${u.sId}')"><i class="fa-solid fa-clock"></i> تحديد موعد</button>
+                        <button class="btn-primary btn-small" onclick="openEditSlotModal('${tId}', '${u.sId}')"><i class="fa-solid fa-clock"></i> تحديد الأيام والساعة</button>
                     </div>
                 `).join('');
             } else {
                 unscheduledPanel.style.display = 'none';
             }
+        }
+
+        // ميزة ذكية جداً: تغيير وقت مجموعة طلاب كاملة يشتركون في نفس الساعة بضغطة زر واحدة
+        async function promptShiftGroupTime(tId, dayName, oldHour24) {
+            if(currentUser.role === 'admin' && !canEdit() && !hasPerm('schedules_manage') && !hasPerm('assign_manage')) {
+                return showToast('لا تملك صلاحية التعديل على المواعيد', 'error');
+            }
+            const { value: newTime } = await Swal.fire({
+                title: `تغيير وقت محاضرة (${formatTimeArabic12(oldHour24)})`,
+                html: `<p style="font-size:13.5px; font-weight:700; margin-bottom:12px;">سيتم تحديث وقت جميع الطلاب المسجلين في هذه الساعة ليوم (${dayName}) إلى الوقت الجديد:</p>
+                       <input type="time" id="swal_new_group_time" value="${oldHour24}" style="padding:12px 20px; font-size:16px; font-weight:900; border-radius:12px; border:2px solid var(--primary); outline:none; font-family:'Cairo';">`,
+                showCancelButton: true,
+                confirmButtonColor: '#4318FF',
+                confirmButtonText: 'اعتماد الوقت الجديد للمجموعة',
+                cancelButtonText: 'إلغاء',
+                preConfirm: () => {
+                    return document.getElementById('swal_new_group_time').value;
+                }
+            });
+
+            if(newTime && normalizeTime24(newTime) !== oldHour24) {
+                const formattedNew = normalizeTime24(newTime);
+                const tAssign = allAssignments[tId] || {};
+                let updatedCount = 0;
+
+                for(let sId in tAssign) {
+                    const parsed = parseScheduleData(tAssign[sId]);
+                    if(parsed.time === oldHour24 && parsed.days.includes(dayName)) {
+                        let newScheduleStr = `${parsed.days.join('، ')} الساعة ${formattedNew}`;
+                        await db.ref(`assignments/${tId}/${sId}`).update({
+                            time: formattedNew,
+                            schedule: newScheduleStr
+                        });
+                        updatedCount++;
+                    }
+                }
+
+                const tName = allTeachers[tId]?.name || tId;
+                await recordAuditLog('تغيير وقت مجموعة محاضرة', 'تعديل', `تم نقل وقت (${updatedCount}) طلاب لدى الأستاذ (${tName}) من الساعة (${formatTimeArabic12(oldHour24)}) إلى الساعة (${formatTimeArabic12(formattedNew)})`);
+                renderMasterSchedule();
+                showToast(`تم تحديث موعد (${updatedCount}) طلاب إلى الساعة ${formatTimeArabic12(formattedNew)}`);
+            }
+        }
+
+        async function quickRemoveStudentFromTeacher(tId, sId) {
+            if(!canDelete() && !currentUser.isSuper) return showToast('لا تملك صلاحية فك الارتباط', 'error');
+            const sName = allStudents[sId]?.name || sId;
+            const tName = allTeachers[tId]?.name || tId;
+
+            Swal.fire({
+                title: 'إزالة الطالب من الجدول؟',
+                text: `سيتم فك ارتباط الطالب (${sName}) من جدول الأستاذ (${tName}).`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#EE5D50',
+                confirmButtonText: 'نعم، إزالة',
+                cancelButtonText: 'تراجع'
+            }).then(async (res) => {
+                if(res.isConfirmed) {
+                    await db.ref(`assignments/${tId}/${sId}`).remove();
+                    await recordAuditLog('فك ارتباط طالب من جدول أستاذ', 'حذف / أرشفة', `تم إزالة الطالب (${sName}) من جدول الأستاذ (${tName})`);
+                    renderMasterSchedule();
+                    showToast('تم إزالة الطالب من الجدول');
+                }
+            });
+        }
+
+        // فتح نافذة التوزيع مع ضبط اليوم والساعة تلقائياً
+        function openAssignAtSpecificSlot(tId, dayName, hour24) {
+            openAssignFromScheduleModal();
+            const tSel = document.getElementById('sch_modal_teacher');
+            if(tSel && tId) tSel.value = tId;
+
+            document.querySelectorAll('.sch-day-cb').forEach(cb => {
+                cb.checked = (cb.value === dayName);
+            });
+            if(hour24) document.getElementById('sch_modal_time').value = hour24;
         }
 
         // فتح نافذة التوزيع المباشر من داخل مركز الجداول
@@ -1277,10 +1817,10 @@
                 return showToast('لا تملك صلاحية تعديل أو توزيع الجداول', 'error');
             }
             document.getElementById('sch_modal_mode').value = 'create';
-            document.getElementById('schModalTitle').innerHTML = `<i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> توزيع طالب جديد لجدول الأستاذ`;
+            document.getElementById('schModalTitle').innerHTML = `<i class="fa-solid fa-user-plus" style="color:var(--primary);"></i> إضافة وتوزيع طالب لجدول الأستاذ`;
             document.getElementById('btnRemoveSlotAssign').style.display = 'none';
 
-            const currentTid = (currentUser.role === 'teacher') ? currentUser.id : document.getElementById('masterScheduleTeacherSelect').value;
+            const currentTid = (currentUser.role === 'teacher') ? currentUser.id : (selectedScheduleTeacherId || document.getElementById('masterScheduleTeacherSelect').value);
 
             const tSel = document.getElementById('sch_modal_teacher');
             tSel.innerHTML = '';
@@ -1323,7 +1863,7 @@
             if(!assignData) return;
 
             document.getElementById('sch_modal_mode').value = 'edit';
-            document.getElementById('schModalTitle').innerHTML = `<i class="fa-solid fa-calendar-pen" style="color:var(--primary);"></i> تعديل جدول وموعد الطالب: ${studentObj ? studentObj.name : sId}`;
+            document.getElementById('schModalTitle').innerHTML = `<i class="fa-solid fa-calendar-pen" style="color:var(--primary);"></i> تعديل موعد وأيام الطالب: ${studentObj ? studentObj.name : sId}`;
             document.getElementById('btnRemoveSlotAssign').style.display = (canDelete() || currentUser.isSuper) ? 'inline-flex' : 'none';
 
             const tSel = document.getElementById('sch_modal_teacher');
@@ -1360,7 +1900,7 @@
             const sId = document.getElementById('sch_modal_student').value;
             const courseName = document.getElementById('sch_modal_course').value.trim() || 'غير محدد';
             const lessonRate = parseFloat(document.getElementById('sch_modal_rate').value) || 0;
-            const timeVal = document.getElementById('sch_modal_time').value;
+            const timeVal = normalizeTime24(document.getElementById('sch_modal_time').value);
             const startDateVal = document.getElementById('sch_modal_startdate').value;
 
             if(!newTid || !sId) return showToast('يرجى تحديد الأستاذ والطالب!', 'error');
@@ -1406,10 +1946,11 @@
                 `تم جدولة الطالب (${sName}) لدى الأستاذ (${tName}) لمادة (${courseName}) في أيام [${selectedDays.join('، ')}] الساعة (${formatTimeArabic12(timeVal)}) وبأجر حصة (${formatMoneyRaw(lessonRate)})`
             );
 
+            selectedScheduleTeacherId = newTid;
             document.getElementById('masterScheduleTeacherSelect').value = newTid;
             closeModal('scheduleSlotModal');
             renderMasterSchedule();
-            showToast('تم حفظ وتحديث الجدول بنجاح');
+            showToast('تم حفظ وتحديث الموعد بنجاح');
         }
 
         async function removeAssignmentFromScheduleModal() {
@@ -1438,65 +1979,82 @@
             });
         }
 
-        // طباعة جدول الأستاذ الأسبوعي الكامل
+        // طباعة جدول الأستاذ الأسبوعي بالتصميم الرسمي الأنيق
         function printTeacherTimetable() {
-            let tId = (currentUser.role === 'teacher') ? currentUser.id : document.getElementById('masterScheduleTeacherSelect').value;
+            let tId = (currentUser.role === 'teacher') ? currentUser.id : selectedScheduleTeacherId;
             if(!tId || !allTeachers[tId]) return showToast('يرجى اختيار أستاذ أولاً لطباعة جدوله', 'error');
 
             const tName = allTeachers[tId].name;
             const tAssign = allAssignments[tId] || {};
-            let dayBuckets = {};
-            WEEK_DAYS.forEach(d => dayBuckets[d] = []);
+            let timeSlotsMap = {};
+            let hoursSet = new Set();
 
             for(let sId in tAssign) {
                 const a = tAssign[sId];
                 const s = allStudents[sId];
                 const parsed = parseScheduleData(a);
-                parsed.days.forEach(d => {
-                    if(dayBuckets[d]) {
-                        dayBuckets[d].push({
+                if(parsed.days.length > 0 && parsed.time) {
+                    hoursSet.add(parsed.time);
+                    if(!timeSlotsMap[parsed.time]) timeSlotsMap[parsed.time] = {};
+                    parsed.days.forEach(d => {
+                        if(!timeSlotsMap[parsed.time][d]) timeSlotsMap[parsed.time][d] = [];
+                        timeSlotsMap[parsed.time][d].push({
                             sName: s ? s.name : sId,
-                            course: a.courseName || s?.courseName || '',
-                            time24: parsed.time || ''
+                            course: a.courseName || s?.courseName || ''
                         });
-                    }
+                    });
+                }
+            }
+
+            let sortedHours = Array.from(hoursSet).sort((a,b) => a.localeCompare(b));
+            let rowsHTML = '';
+
+            if(sortedHours.length === 0) {
+                rowsHTML = `<tr><td colspan="8" style="padding:30px;">لا توجد محاضرات مجدولة حالياً</td></tr>`;
+            } else {
+                sortedHours.forEach(h24 => {
+                    rowsHTML += `<tr>
+                        <td style="font-weight:900; background:#EEF2FF; color:#4318FF; font-size:13px;">${formatTimeArabic12(h24)}<br><small style="color:#666;">${h24}</small></td>`;
+                    WEEK_DAYS.forEach(dayName => {
+                        let list = (timeSlotsMap[h24] && timeSlotsMap[h24][dayName]) ? timeSlotsMap[h24][dayName] : [];
+                        if(list.length === 0) {
+                            rowsHTML += `<td style="color:#ccc;">—</td>`;
+                        } else {
+                            let content = list.map(item => `<div style="background:#F4F7FE; border-right:3px solid #4318FF; padding:4px 6px; margin-bottom:4px; border-radius:4px; text-align:right;">
+                                <strong style="font-size:12px; color:#2B3674; display:block;">${item.sName}</strong>
+                                <span style="font-size:10.5px; color:#4318FF;">${item.course}</span>
+                            </div>`).join('');
+                            rowsHTML += `<td style="vertical-align:top; padding:6px;">${content}</td>`;
+                        }
+                    });
+                    rowsHTML += `</tr>`;
                 });
             }
 
-            let rowsHTML = '';
-            WEEK_DAYS.forEach(dayName => {
-                let slots = dayBuckets[dayName];
-                slots.sort((a,b) => (a.time24||'99:99').localeCompare(b.time24||'99:99'));
-                let badges = slots.length === 0
-                    ? '<span style="color:#A3AED0;">لا توجد محاضرات</span>'
-                    : slots.map(sl => `<div style="display:inline-block; background:#F4F7FE; border:1px solid #4318FF; border-radius:8px; padding:6px 12px; margin:4px; text-align:right;">
-                        <strong style="color:#4318FF; display:block; font-size:12px;">${formatTimeArabic12(sl.time24)}</strong>
-                        <span style="color:#2B3674; font-weight:800; font-size:13px;">${sl.sName}</span>
-                        <small style="color:#666; display:block; font-size:11px;">${sl.course}</small>
-                    </div>`).join('');
-
-                rowsHTML += `<tr>
-                    <td style="width:18%; font-weight:900; font-size:15px; background:#EEF2FF; color:#4318FF;">${dayName}</td>
-                    <td style="text-align:right; padding:10px;">${badges}</td>
-                </tr>`;
-            });
-
-            let printHTML = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>جدول الأستاذ - ${tName}</title>
+            let printHTML = `<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><title>جدول الساعات للأستاذ - ${tName}</title>
             <style>
                 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@600;700;800;900&display=swap');
-                @page { size: A4 landscape; margin: 12mm; }
+                @page { size: A4 landscape; margin: 10mm; }
                 * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; font-family: 'Cairo', sans-serif; }
                 body { margin: 0; color: #2B3674; }
-                .header { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #4318FF; padding-bottom:12px; margin-bottom:18px; }
-                table { width:100%; border-collapse:collapse; }
-                th, td { border:2px solid #E0E5F2; padding:10px; text-align:center; }
-                th { background:#4318FF; color:#fff; font-weight:900; }
+                .header { display:flex; justify-content:space-between; align-items:center; border-bottom:3px solid #4318FF; padding-bottom:10px; margin-bottom:15px; }
+                table { width:100%; border-collapse:collapse; table-layout:fixed; }
+                th, td { border:1.5px solid #CBD5E1; padding:8px; text-align:center; }
+                th { background:#4318FF; color:#fff; font-weight:900; font-size:13.5px; }
             </style></head><body>
                 <div class="header">
-                    <div><h1 style="margin:0; color:#4318FF; font-size:24px;">معهد كامبردج - الجدول الأسبوعي للمحاضرات</h1><p style="margin:4px 0 0; font-weight:700;">الأستاذ: ${tName} (${tId})</p></div>
-                    <div style="font-weight:800; font-size:13px;">تاريخ الإصدار: ${new Date().toLocaleDateString('ar-IQ')}</div>
+                    <div><h1 style="margin:0; color:#4318FF; font-size:22px;">معهد كامبردج - جدول المحاضرات الأسبوعي للأستاذ</h1><p style="margin:4px 0 0; font-weight:800;">الأستاذ: ${tName} (${tId})</p></div>
+                    <div style="font-weight:800; font-size:12.5px;">تاريخ الطباعة: ${new Date().toLocaleDateString('ar-IQ')}</div>
                 </div>
-                <table><thead><tr><th>اليوم</th><th>الطلاب والمواعيد المجدولة</th></tr></thead><tbody>${rowsHTML}</tbody></table>
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width:110px; background:#2B3674;">الساعة / اليوم</th>
+                            <th>السبت</th><th>الأحد</th><th>الإثنين</th><th>الثلاثاء</th><th>الأربعاء</th><th>الخميس</th><th>الجمعة</th>
+                        </tr>
+                    </thead>
+                    <tbody>${rowsHTML}</tbody>
+                </table>
                 <script>window.onload = function(){ setTimeout(function(){ window.print(); }, 500); }<\/script>
             </body></html>`;
 
@@ -1519,7 +2077,6 @@
             let logsArray = Object.values(allAuditLogs || {});
             logsArray.sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
 
-            // تحديث قائمة المستخدمين في الفلتر
             const userSel = document.getElementById('auditFilterUser');
             if(userSel) {
                 const currentSelectedUser = userSel.value;
@@ -1698,7 +2255,7 @@
         }
 
         async function teacherSaveStudent() {
-            const name = document.getElementById('ts_name').value.trim(), phone = document.getElementById('ts_phone').value.trim(), courseName = document.getElementById('ts_course').value.trim() || 'غير محدد', startDate = document.getElementById('ts_start_date').value, initLectures = parseInt(document.getElementById('ts_initial_lectures').value) || 0, time = document.getElementById('ts_time').value;
+            const name = document.getElementById('ts_name').value.trim(), phone = document.getElementById('ts_phone').value.trim(), courseName = document.getElementById('ts_course').value.trim() || 'غير محدد', startDate = document.getElementById('ts_start_date').value, initLectures = parseInt(document.getElementById('ts_initial_lectures').value) || 0, time = normalizeTime24(document.getElementById('ts_time').value);
             if(!name) return showToast('الرجاء إدخال اسم الطالب', 'error');
 
             let targetTid = currentUser.role === 'teacher' ? currentUser.id : document.getElementById('ts_teacher_select').value;
@@ -1762,6 +2319,7 @@
         // ================= الإدارة المباشرة (الأستاذ) =================
         function setupRealtimeListenersTeacher() {
             const tId = currentUser.id;
+            selectedScheduleTeacherId = tId;
             db.ref('teachers').on('value', snap => { allTeachers = snap.val() || {}; populateScheduleTeacherDropdown(); });
             db.ref('students').on('value', snap => { allStudents = snap.val() || {}; renderTeacherPortal(); renderMasterSchedule(); });
             db.ref(`assignments/${tId}`).on('value', snap => { if(!allAssignments[tId]) allAssignments[tId] = {}; allAssignments[tId] = snap.val() || {}; renderTeacherPortal(); renderMasterSchedule(); });
@@ -1873,7 +2431,8 @@
 
                 populateScheduleTeacherDropdown();
                 renderTeachersGrid();
-                renderMasterSchedule();
+                renderScheduleTeachersCards();
+                if(selectedScheduleTeacherId) renderMasterSchedule();
                 
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') { document.getElementById('tpAdminFilter').style.display = 'block'; renderTeacherPortal(); }
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
@@ -1882,7 +2441,8 @@
             db.ref('assignments').on('value', snap => { 
                 allAssignments = snap.val() || {}; 
                 renderTeachersGrid();
-                renderMasterSchedule();
+                renderScheduleTeachersCards();
+                if(selectedScheduleTeacherId) renderMasterSchedule();
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal(); 
                 if(currentViewingTeacherId) refreshTeacherProfileUI(); 
             });
@@ -1943,7 +2503,8 @@
                 if(dataTable) { dataTable.clear(); dataTable.rows.add(tableData); dataTable.draw(); }
                 if(hasPerm('teacher_portal') && currentUser.role === 'admin') renderTeacherPortal();
                 if(currentViewingTeacherId) refreshTeacherProfileUI();
-                renderMasterSchedule();
+                renderScheduleTeachersCards();
+                if(selectedScheduleTeacherId) renderMasterSchedule();
                 
                 filterCards('search_students', 'studentsContainer');
                 filterCards('search_subs', 'subscriptionsContainer');
@@ -2149,7 +2710,7 @@
         }
 
         async function saveSmartAssignment() { 
-            const sId = document.getElementById('smart_s_id').value, tId = document.getElementById('smart_t_id').value, price = document.getElementById('smart_price').value, time = document.getElementById('smart_time').value; 
+            const sId = document.getElementById('smart_s_id').value, tId = document.getElementById('smart_t_id').value, price = document.getElementById('smart_price').value, time = normalizeTime24(document.getElementById('smart_time').value); 
             if(!tId || price === '') return showToast('يجب تحديد الأستاذ والأجر!', 'error'); 
             const checkboxes = document.querySelectorAll('.smart-day-cb:checked'); let selectedDays = []; checkboxes.forEach(cb => selectedDays.push(cb.value)); 
             let updateData = { courseName: allStudents[sId].courseName || 'غير محدد', lessonRate: parseFloat(price) };
